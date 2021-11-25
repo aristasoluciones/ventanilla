@@ -9,10 +9,9 @@ class Variables {
 		switch($opc){
 			case 1:
 				$this->Servidor = "localhost";
-				$this->BaseDatos = "demosystem_turismosis";
-				$this->Usuario = "demosystem_turismosis";
-				$this->Clave = "*pharadox";
-				//$this->Clave = "fN9En8R3i)";
+				$this->BaseDatos = "turismo";
+				$this->Usuario = "root";
+				$this->Clave = "";
 			break;
 			default:
 				header('Location: http://demosistema.com/turismo/ventanilla');

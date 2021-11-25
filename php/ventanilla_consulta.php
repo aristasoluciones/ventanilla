@@ -16,8 +16,8 @@ $data = json_decode(file_get_contents('php://input'), true);
 if(isset($data['opcion'])) $_POST = $data;
 switch($_POST['opcion']) {
     case 1:
-      $id =  isset($_SESSION['vUsuario']) ? $_SESSION['vUsuario']['id_turista'] : -1;
-      $strQuery = $querys->getListSolicitudByUsuario($id, $_POST['tipo']);
+      $data =  isset($_SESSION['vUsuario']) ? $_SESSION['vUsuario'] : -1;
+      $strQuery = $querys->getListSolicitudByUsuario($data, $_POST['tipo']);
         if(!$Query = $conexion->obtenerlista($strQuery)) {
             $jsondata['resp'] = 0;
             $jsondata['data'] = $strQuery;            
@@ -30,7 +30,9 @@ switch($_POST['opcion']) {
                 foreach($Query as $row) {
                     $columna5 = "";
                     if ((int)$row->id_etapa_queja === 2) {
-                        $columna5 = "<div class='btn-group'>";
+                        $columna5 .= "<div class='btn-toolbar'>";
+                        $columna5 .= "<a type='button' class='btn btn-warning mr-1' title='Ver notificaciones'><i class='fa fa-bell'></i></a>";
+                        $columna5 .= "<div class='btn-group mr-1'>";
                         $columna5 .= "<button type='button' class='btn btn-info'>Acciones</button>";
                         $columna5 .= "<button type='button' class='btn btn-info dropdown-toggle dropdown-icon' data-toggle='dropdown' >";
                         $columna5 .= "<span class='sr-only'>Toggle Dropdown</span>";
@@ -40,12 +42,12 @@ switch($_POST['opcion']) {
                         $columna5 .= "</div>";
                         $columna5 .= "</button>";
                         $columna5 .= "</div>";
+                        $columna5 .= "</div>";
                     }
-
                     $sub_array = array();
                     $sub_array[] = $row->folio;
                     $sub_array[] = $row->nombre. " ". $row->apellidos;
-                    $sub_array[] = $row->etapa." - Nombre de la etapa";
+                    $sub_array[] = $row->etapa."<br><smal class='badge badge-warning'>Por vencer</smal>";
                     $sub_array[] = $columna5;
                     $data[] = $sub_array;
                 }

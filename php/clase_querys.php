@@ -2,30 +2,24 @@
 
 class QuerysB
 {
-    public function getListSolicitudByUsuario($id, $tipo) {
-     $strQuery  = "SELECT a.id_solicitud_queja,a.folio, a.nombre, a.apellidos, a.fecha_queja,
+    public function getListSolicitudByUsuario($data, $tipo) {
+
+      $strQuery  = "SELECT a.id_solicitud_queja,a.folio, a.nombre, a.apellidos, a.fecha_queja,
                   a.id_etapa_queja, c.nombre as nacionalidad, d.nombre as etapa, b.nombre as lugar,e.nombre as localidad
                   FROM tbl_solicitud_queja  a
                   INNER JOIN tblc_municipio b ON a.id_municipio_hecho = b.id_municipio
                   INNER JOIN tblc_localidad_delegacion e ON a.id_localidad_hecho = e.id_localidad_delegacion
                   LEFT JOIN tblc_pais c ON a.id_pais = c.id_pais
                   LEFT JOIN tblc_etapa_queja d ON a.id_etapa_queja = d.id_etapa_queja
-                  WHERE ISNULL(a.fecha_eliminado) and id_turista = '".$id."' and id_tipo_queja = '".$tipo."' ";
+                  WHERE ISNULL(a.fecha_eliminado) and (a.id_turista = '".$data['id_turista']."' and a.correo='".$data['correo']."') 
+                  AND a.id_tipo_queja = '".$tipo."' ";
         return $strQuery;
     }
+
     public function getSolicitud($id) {
         $strQuery  = "SELECT a.*, b.nombre tipo_queja FROM tbl_solicitud_queja a 
                   INNER JOIN tblc_tipo_queja b ON a.id_tipo_queja=b.id_tipo_queja
                   WHERE a.id_solicitud_queja = '". $id."'";
-        return $strQuery;
-    }
-    function existeUsuario($usuario = '')
-    {
-        $sentencia = ($usuario != '') ? " AND u.usuario = '" . $usuario . "'" : "";
-        $strQuery = "SELECT u.* ";
-        $strQuery .= "FROM tbl_usuario u ";
-        $strQuery .= "WHERE u.estatus = 1 " . $sentencia;
-        $strQuery .= " ORDER BY u.usuario";
         return $strQuery;
     }
 
@@ -36,7 +30,6 @@ class QuerysB
         $strQuery = "SELECT u.* ";
         $strQuery .= "FROM tbl_solicitud_queja u ";
         $strQuery .= "WHERE u.estatus = 1 " . $sentencia;
-        $strQuery .= " ORDER BY u.correo";
         return $strQuery;
     }
 

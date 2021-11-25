@@ -9,6 +9,6 @@ head.js("plugins/jquery/jquery.min.js","plugins/bootstrap/js/bootstrap.bundle.mi
 "https://maps.googleapis.com/maps/api/js?key=AIzaSyA2mxFO0scrEjufcAxxBwnoqNFMQmxfM4k&libraries=drawing,visualization,geometry",
 "js/scriptsGoogleMaps.js","plugins/jquery-mousewheel/jquery.mousewheel.js","dist/js/adminlte.js",
 "plugins/raphael/raphael.min.js","plugins/jquery-mapael/jquery.mapael.min.js","plugins/jquery-mapael/maps/usa_states.min.js",
-"plugins/chart.js/Chart.min.js", function(){
+"plugins/chart.js/Chart.min.js", "plugins/jquery-validation/jquery.validate.min.js",  "plugins/jquery-validation/localization/messages_es.min.js", function(){
 });
 head.js("js/funciones_ventanilla.js");

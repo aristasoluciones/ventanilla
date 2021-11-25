@@ -1,7 +1,7 @@
 <?php
 @session_start();
-ini_set('display_errors', '0');
-if(isset($_SESSION["autentificado_sis"])) {
+ini_set('display_errors', '1');
+if(isset($_SESSION["autentificado"])) {
     echo'<script languaje="javascript">
 				location.href="inicio";
 			</script>';

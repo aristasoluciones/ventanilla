@@ -5,7 +5,7 @@ $id = $funciones->limpia($_POST['id']);
 if ($id > 0) {
     $row = $conexion->fetch_objet($querys->getSolicitud($id));
 }
-// aca deberiamos consultar el eltimo registro de su historial
+// aca deberiamos consultar el ultimo registro de su historial
 ?>
 <form name="frm-seguimiento" id="frm-seguimiento" enctype="multipart/form-data">
     <div class="overlay d-none" id="loading-send"><i class="fas fa-2x fa-sync-alt fa-spin"></i></div>
@@ -22,6 +22,10 @@ if ($id > 0) {
                  $opcion = 2;
                  include_once ("formulario/form_seguimiento.php");
              break;
+            case 2:
+                $opcion = 1;
+                include_once ("formulario/form_seguimiento.php");
+            break;
             }
         ?>
         <div style="clear: both;"></div>
@@ -30,6 +34,6 @@ if ($id > 0) {
         <input type="hidden" id="id" name="id" value="<?= $id ?>">
         <input type="hidden" id="opcion" name="opcion" value="<?= $opcion ?>">
         <button type="button" class="btn btn-danger" data-dismiss="modal">Cerrar</button>
-        <input type="button" class="btn btn-primary" id="btn-guardar-seguimiento" value="Guardar" />
+        <input type="button" class="btn btn-primary" id="btn-guardar-seguimiento" value="Enviar" />
     </div>
 </form>
