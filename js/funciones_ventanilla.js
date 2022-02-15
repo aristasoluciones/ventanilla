@@ -22,7 +22,7 @@ function cargarMenu(pagina){
 }
 function logout() {
    $.post( web_root + '/php/logout.php')
-    location.href = ''
+    location.href = 'inicio'
 }
 
 function guardar_seguimiento () {

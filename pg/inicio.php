@@ -1,16 +1,12 @@
 <?php
 $data =  isset($_SESSION['vUsuario']) ? $_SESSION['vUsuario'] : [];
-$strQuery = $querys->getListSolicitudByUsuario($data, 2);
-$denuncias = $conexion->obtenerlista($strQuery);
-$total_denuncias =  is_array($denuncias) ? count($denuncias) : 0;
+$strQuery = $querys->getTotalSolicitud(2);
+$denuncias = $conexion->fetch_array($strQuery);
+$total_denuncias =  $denuncias['total'];
 
-$strQuery = $querys->getListSolicitudByUsuario($data, 1);
-$quejas = $conexion->obtenerlista($strQuery);
-$total_quejas =  is_array($quejas) ? count($quejas) : 0;
-
-$strQuery = $querys->getListSolicitudByUsuario($data, 3);
-$conciliacion = $conexion->obtenerlista($strQuery);
-$total_conciliacion =  is_array($conciliacion) ? count($conciliacion) : 0;
+$strQuery = $querys->getTotalSolicitud(1);
+$quejas = $conexion->fetch_array($strQuery);
+$total_quejas =  $quejas['total'];
 ?>
 <div class="content-header">
     <div class="container">
