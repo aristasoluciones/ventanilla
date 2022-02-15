@@ -8,34 +8,16 @@
     </div>
 </div><!--.page-content-header-->
 <!-- Main content -->
-<div class="content">
-    <div class="container">
+<section class="content">
+    <div class="container-fluid">
         <div class="row">
-            <div class="col-md-12">
-                <div class="card card-info" id="card_denuncia">
-                    <div class="card-header">
-                        <h3 class="card-title">Denuncias</h3>
-                    </div>
-                    <div class="card-body table-responsive">
-                        <table id="listado" class="table table-bordered table-striped">
-                            <thead>
-                                <th>Folio</th>
-                                <th>Nombre</th>
-                                <th>Etapa</th>
-                                <th>Acciones</th>
-                            </thead>
-                            <tbody></tbody>
-                        </table>
-                    </div>
-                </div>
+            <div class="col-12"  id="content-lista">
             </div>
         </div>
-    </div>
-</div>
+    </div><!--/. container-fluid -->
+</section>
 <script type="text/javascript">
     window.onload = function() {
-        administrar_listado(2);
+        parent.cargar_listado_manifestacion(1, 2)
     }
 </script>
-
-<!-- /.content -->

@@ -9,7 +9,7 @@ class FuncionesB
     public function webRoot()
     {
         $http_host = $_SERVER['HTTP_HOST'];
-        return $http_host === 'sharp-saha.108-175-11-59.plesk.page'
+        return $http_host !== 'ventanilla.test'
             ? '../ventanilla'
             : "http://" . $http_host;
     }

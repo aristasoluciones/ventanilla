@@ -47,17 +47,6 @@ $total_conciliacion =  is_array($conciliacion) ? count($conciliacion) : 0;
                     </div>
                 </a>
             </div>
-            <div class="col-4">
-                <a class="small-box bg-info" href="<?= $web_root ?>/conciliacion">
-                    <div class="inner">
-                        <h3><?= $total_conciliacion ?></h3>
-                        <p>Mis Conciliaciones</p>
-                    </div>
-                    <div class="icon">
-                        <i class="far fa-file-alt"></i>
-                    </div>
-                </a>
-            </div>
         </div>
     </div>
 </div>

@@ -11,4 +11,5 @@ head.js("plugins/jquery/jquery.min.js","plugins/bootstrap/js/bootstrap.bundle.mi
 "plugins/raphael/raphael.min.js","plugins/jquery-mapael/jquery.mapael.min.js","plugins/jquery-mapael/maps/usa_states.min.js",
 "plugins/chart.js/Chart.min.js", "plugins/jquery-validation/jquery.validate.min.js",  "plugins/jquery-validation/localization/messages_es.min.js", function(){
 });
-head.js("js/funciones_ventanilla.js");
+var hash =  Math.random().toString(36).substr(2, 9);
+head.js("js/funciones_ventanilla.js?"+hash);

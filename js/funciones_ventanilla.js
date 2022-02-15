@@ -1,5 +1,5 @@
 var url_hostame = document.location.hostname
-var web_root = url_hostame === 'sharp-saha.108-175-11-59.plesk.page'
+var web_root = url_hostame !=='ventanilla.test'
     ? '/turismo/ventanilla'
     : ''
 let url_subir     = web_root + '/php/ventanilla_subir.php';
@@ -74,41 +74,19 @@ function guardar_seguimiento () {
     })
 }
 
-function ventanilla_administrar_registro(id = 0){
+function cargar_listado_manifestacion (pagina, tipo, estatus= 0) {
     $.ajax({
-        beforeSend: function(){
-            $('#card_denuncia').append(overlayTemplate);
+        beforeSend: function() {
+            $("#content-lista").html(cargar)
         },
-        url: 'pg/ventanilla/denuncia_registro.php',
-        type: "post",
-        dataType: "html",
-        data: {'id':id},
-        success: function(resp){
-            $('#card_denuncia').find('.overlay').remove();
-            $("#ContenidoGeneral").html(resp);
+        type:    "post",
+        url:      web_root + '/pg/lista/lista_manifestacion.php',
+        data:    { tipo, pagina, estatus },
+        success: function(data){
+            console.log(data)
+            $("#content-lista").html(data)
         }
-    });
-}
-
-function administrar_listado(tipo) {
-    var options = {
-        searching: true,
-        processing: true,
-        destroy: true,
-        language: {
-            url: web_root + 'plugins/datatables/i18n/es-mx.json'
-        },
-        ajax: {
-            type:'post',
-            url: web_root + '/php/ventanilla_consulta.php',
-            data: { opcion: 1, tipo },
-            dataType:'json',
-            dataSrc : function (response) {
-                return 'data' in response ? response.data : []
-            }
-        },
-    }
-    $('#listado').DataTable(options);
+    })
 }
 
 function open_modal_seguimiento (id) {
@@ -133,11 +111,6 @@ function open_modal_seguimiento (id) {
             $("#modal-content-default").html(data)
         }
     })
-}
-
-function limpiaForm(id){
-   $('#card_denuncia_accion').append(overlayTemplate);
-    ventanilla_administrar_registro(0);
 }
 function close_modal() {
     $("#modal-content-default").html()
