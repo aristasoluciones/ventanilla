@@ -6,7 +6,7 @@
     <!-- Left navbar links -->
      <div class="container">
          <a href="<?= $web_root ?>" class="navbar-brand">
-             <img src="../dist/img/propios/sectur-min.png" alt="STC" class="brand-image elevation-3" style="opacity: .8">
+             <img src="../dist/img/propios/escudoIconoP.png" alt="STC" class="brand-image elevation-3" style="opacity: .8">
              <span class="brand-text font-weight-light">Plataforma CIET</span>
          </a>
          <button class="navbar-toggler order-1" type="button" data-toggle="collapse" data-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">

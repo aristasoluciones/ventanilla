@@ -1,7 +1,7 @@
 var url_hostame = document.location.hostname
 var web_root = url_hostame !=='ventanilla.test'
-    ? '/turismo/ventanilla'
-    : ''
+    ? 'https://' + url_hostame
+    : 'http://'+ url_hostame
 let url_subir     = web_root + '/php/ventanilla_subir.php';
 let url_consulta  = web_root + '/php/ventanilla_consulta.php';
 let url_eliminar  = web_root + '/php/ventanilla_eliminar.php';

@@ -25,11 +25,11 @@ class QuerysB
 
     function existeEmailFolio($email = '', $folio = '')
     {
-        $sentencia = " AND u.correo = '" . $email . "'";
+        $sentencia = " WHERE u.correo = '" . $email . "'";
         $sentencia .= " AND u.folio = '" . $folio . "'";
         $strQuery = "SELECT u.* ";
         $strQuery .= "FROM tbl_solicitud_queja u ";
-        $strQuery .= "WHERE u.estatus = 1 " . $sentencia;
+        $strQuery .= $sentencia;
         return $strQuery;
     }
 

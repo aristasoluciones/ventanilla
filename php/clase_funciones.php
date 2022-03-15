@@ -10,7 +10,7 @@ class FuncionesB
     {
         $http_host = $_SERVER['HTTP_HOST'];
         return $http_host !== 'ventanilla.test'
-            ? '../ventanilla'
+            ? 'https://'.$http_host
             : "http://" . $http_host;
     }
 
