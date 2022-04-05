@@ -1,6 +1,6 @@
 <?php
-	@session_start();	
-	if(isset($_SESSION["autentificado_sis"])){
+	@session_start();
+	if(isset($_SESSION["autentificado"])){
         $idConexion = (isset($_SESSION["idConexion"]))?$_SESSION["idConexion"]:1;
 		$dUsuario = (isset($_SESSION["vUsuario"]))?$_SESSION["vUsuario"]:array();
     }
@@ -17,7 +17,9 @@
 	require_once("clase_mysql.php");
 	include_once("clase_querys.php");
 	include_once("clase_funciones.php");
-	//--------------------------------------------------
+	include_once("clase_paginador.php");
+
+//--------------------------------------------------
 	
 	$conexion  = new DB_MySql($idConexion);
 	$funciones = new FuncionesB();

@@ -1,7 +1,11 @@
-let url_subir     = 'php/ventanilla_subir.php';
-let url_consulta  = 'php/ventanilla_consulta.php';
-let url_eliminar  = 'php/ventanilla_eliminar.php';
-let url_imprimir  = 'php/ventanilla_imprimir.php';
+var url_hostame = document.location.hostname
+var web_root = url_hostame !=='ventanilla.test'
+    ? 'https://' + url_hostame
+    : 'http://'+ url_hostame
+let url_subir     = web_root + '/php/ventanilla_subir.php';
+let url_consulta  = web_root + '/php/ventanilla_consulta.php';
+let url_eliminar  = web_root + '/php/ventanilla_eliminar.php';
+let url_imprimir  = web_root + '/php/ventanilla_imprimir.php';
 let cargar = "<div class='tab-loading'><div><center><h2 class='display-4'>Cargando Información <i class='fa fa-sync fa-spin'></i></h2></center></div></div>";
 let guardar = "<div class='tab-loading'><div><center><h2 class='display-4'>Guardando Información <i class='fa fa-sync fa-spin'></i></h2></center></div></div>";
 let actualizar = "<div class='tab-loading'><div><center><h2 class='display-4'>actualizando Información <i class='fa fa-sync fa-spin'></i></h2></center></div></div>";
@@ -17,44 +21,72 @@ function cargarMenu(pagina){
     location.href= pagina
 }
 function logout() {
-   $.post('../php/logout.php')
-    location.href = ''
-}
-function ventanilla_administrar_registro(id = 0){
-    $.ajax({
-        beforeSend: function(){
-            $('#card_denuncia').append(overlayTemplate);
-        },
-        url: 'pg/ventanilla/denuncia_registro.php',
-        type: "post",
-        dataType: "html",
-        data: {'id':id},
-        success: function(resp){
-            $('#card_denuncia').find('.overlay').remove();
-            $("#ContenidoGeneral").html(resp);
-        }
-    });
+   $.post( web_root + '/php/logout.php')
+    location.href = 'inicio'
 }
 
-function administrar_listado(tipo) {
-    var options = {
-        searching: true,
-        processing: true,
-        destroy: true,
-        language: {
-            url: '../plugins/datatables/i18n/es-mx.json'
+function guardar_seguimiento () {
+    var form = $(this).parents('form:first')
+    var formData = new FormData(form[0])
+
+    form.validate({
+        errorElement: 'span',
+        errorClass: 'text-danger',
+        errorPlacement: function(error, element) {
+            var parent_element =  element.parent(':first')
+            if(element.attr("type") === "checkbox")
+                error.insertAfter(parent_element)
+            else
+                error.insertAfter(element)
         },
-        ajax: {
-            type:'post',
-            url: '../php/ventanilla_consulta.php',
-            data: { opcion: 1, tipo },
-            dataType:'json',
-            dataSrc : function (response) {
-                return 'data' in response ? response.data : []
-            }
+        rules: {
+            comentario: {
+                required: true,
+            },
+        }
+    })
+    var isValid =  form.valid()
+    if(!isValid)
+        return
+
+    $.ajax({
+        url: url_subir,
+        type: 'POST',
+        data: formData,
+        dataType: 'json',
+        processData: false,
+        contentType: false,
+        cache: false,
+        beforeSend: function () {
+            $('#loading-send').removeClass('d-none')
+            $('#btn-guardar-seguimiento').addClass('d-none')
+        }
+    }).done(function (data) {
+        mostrar_mensaje(data.resp === 1 ? 'Exito' : 'Error',
+            data.resp === 1 ? 'Datos actualizados' : 'Ocurrio un error al intentar actualizar la información',
+            data.resp === 1 ? 'success' : 'danger')
+        if(data.resp === 1) {
+            window.location.reload()
+        } else {
+            $('#loading-send').addClass('d-none')
+            $('#btn-guardar-seguimiento').removeClass('d-none')
+        }
+    })
+}
+
+function cargar_listado_manifestacion (pagina, tipo, estatus= 0) {
+    $.ajax({
+        beforeSend: function() {
+            $("#content-lista").html(cargar)
         },
-    }
-    $('#listado').DataTable(options);
+        type:    "post",
+        url:      web_root + '/pg/lista/lista_manifestacion.php',
+        data:    { tipo, pagina, estatus },
+        success: function(data){
+            console.log(data)
+            $("#content-lista").html(data)
+        }
+    })
 }
 
 function open_modal_seguimiento (id) {
@@ -63,7 +95,7 @@ function open_modal_seguimiento (id) {
         return;
     }
 
-    url    = '/pg/modal_seguimiento.php'
+    url    = web_root + '/pg/modal_seguimiento.php'
     $('div.modal-dialog').css({'max-width':'60%'})
     params = {'id':id}
     $.ajax({
@@ -80,15 +112,23 @@ function open_modal_seguimiento (id) {
         }
     })
 }
-
-function limpiaForm(id){
-   $('#card_denuncia_accion').append(overlayTemplate);
-    ventanilla_administrar_registro(0);
-}
 function close_modal() {
     $("#modal-content-default").html()
     $('#modal-default').modal('hide')
 
 }
+function mostrar_mensaje(titulo, mensaje, color='danger'){
+    $(this).Toasts('create', {
+        title: titulo,
+        body: mensaje,
+        icon: 'fas fa-exclamation-triangle',
+        autoremove: true,
+        delay: 4000,
+        close: false,
+        autohide: true,
+        class : 'bg-'+color
+    });
+}
 
 $(document).on('click', '#btn-logout', logout);
+$(document).on('click', '#btn-guardar-seguimiento', guardar_seguimiento);

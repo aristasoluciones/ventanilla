@@ -1,10 +1,9 @@
 <?Php
 	@session_start();
-    ini_set('display_errors', '0');
-    if(isset($_SESSION["autentificado_sis"])) {
-        $autenticado_sis = $_SESSION["autentificado_sis"];
+    ini_set('display_errors', '1');
+    if(isset($_SESSION["autentificado"])) {
+        $autenticado_sis = $_SESSION["autentificado"];
         $vUsuario = $_SESSION["vUsuario"];
-        $id_acceso = $_SESSION['id_acceso'];
     }
     else {
         echo'<script languaje="javascript">
@@ -28,7 +27,7 @@
       'denuncia',
       'conciliacion'
     ];
-
+    $web_root =  $funcionesB->webRoot();
     if($autenticado_sis == md5("sistemaventanilla")){
         $url = isset($_GET['url']) ? $_GET['url'] : 'inicio';
         $modulo = in_array($url, $modules) ? $url : 'inicio';

@@ -18,6 +18,6 @@
 </section>
 <script type="text/javascript">
     window.onload = function() {
-        parent.cargar_listado_manifestacion(1, 2)
+        parent.cargar_listado_manifestacion(1, 1)
     }
 </script>

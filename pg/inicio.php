@@ -1,17 +1,12 @@
 <?php
-$id =  isset($_SESSION['vUsuario']) ? $_SESSION['vUsuario']['id_turista'] : -1;
-$strQuery = $querys->getListSolicitudByUsuario($id, 1);
-$denuncias = $conexion->obtenerlista($strQuery);
-$total_denuncias =  is_array($denuncias) ? count($denuncias) : 0;
+$data =  isset($_SESSION['vUsuario']) ? $_SESSION['vUsuario'] : [];
+$strQuery = $querys->getTotalSolicitud(2);
+$denuncias = $conexion->fetch_array($strQuery);
+$total_denuncias =  $denuncias['total'];
 
-$strQuery = $querys->getListSolicitudByUsuario($id, 2);
-$quejas = $conexion->obtenerlista($strQuery);
-$total_quejas =  is_array($quejas) ? count($quejas) : 0;
-
-$strQuery = $querys->getListSolicitudByUsuario($id, 3);
-$conciliacion = $conexion->obtenerlista($strQuery);
-$total_conciliacion =  is_array($conciliacion) ? count($conciliacion) : 0;
-
+$strQuery = $querys->getTotalSolicitud(1);
+$quejas = $conexion->fetch_array($strQuery);
+$total_quejas =  $quejas['total'];
 ?>
 <div class="content-header">
     <div class="container">
@@ -27,7 +22,7 @@ $total_conciliacion =  is_array($conciliacion) ? count($conciliacion) : 0;
     <div class="container">
         <div class="row">
             <div class="col-4">
-                <a class="small-box bg-info" href="/denuncia">
+                <a class="small-box bg-info" href="<?= $web_root ?>/denuncia">
                     <div class="inner">
                         <h3><?= $total_denuncias ?></h3>
                         <p>Mis denuncias</p>
@@ -38,7 +33,7 @@ $total_conciliacion =  is_array($conciliacion) ? count($conciliacion) : 0;
                 </a>
             </div>
             <div class="col-4">
-                <div class="small-box bg-info">
+                <a class="small-box bg-info" href="<?= $web_root ?>/queja">
                     <div class="inner">
                         <h3><?= $total_quejas ?></h3>
                         <p>Mis Quejas</p>
@@ -46,18 +41,7 @@ $total_conciliacion =  is_array($conciliacion) ? count($conciliacion) : 0;
                     <div class="icon">
                         <i class="far fa-file-alt"></i>
                     </div>
-                </div>
-            </div>
-            <div class="col-4">
-                <div class="small-box bg-info">
-                    <div class="inner">
-                        <h3><?= $total_conciliacion ?></h3>
-                        <p>Mis Conciliaciones</p>
-                    </div>
-                    <div class="icon">
-                        <i class="far fa-file-alt"></i>
-                    </div>
-                </div>
+                </a>
             </div>
         </div>
     </div>

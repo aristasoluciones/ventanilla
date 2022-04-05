@@ -32,8 +32,8 @@ ini_set('display_errors', '1');
     $dato = @$conexion->fetch_array_assoc($querys->existeEmailFolio($correo, $folio));
     $resultados = @$conexion->numregistros();
     if($resultados > 0){
-        $_SESSION["autentificado_sis"]  = md5("sistemaventanilla");
-        $_SESSION["vUsuario"]           = $dato;
+        $_SESSION["autentificado"]  = md5("sistemaventanilla");
+        $_SESSION["vUsuario"]       = $dato;
 
         $jsondata['resp'] = 1;
         header('Content-type: application/json; charset=utf-8');

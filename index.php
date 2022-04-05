@@ -1,12 +1,14 @@
 <?php
 @session_start();
-ini_set('display_errors', '0');
-if(isset($_SESSION["autentificado_sis"])) {
+ini_set('display_errors', '1');
+if(isset($_SESSION["autentificado"])) {
     echo'<script languaje="javascript">
 				location.href="inicio";
 			</script>';
     exit(0);
 }
+$folio  =  $_POST['folio'] ?? '';
+$correo = $_POST['correo'] ?? '';
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -33,7 +35,7 @@ if(isset($_SESSION["autentificado_sis"])) {
 <body class="hold-transition bg-light">
 <div class="container">
     <div class="py-5 text-center">
-        <h2>Seguimiento en linea de quejas y denuncias de la Secretaria de Turismo del Estado de Chiapas</h2>
+        <h2>Seguimiento en línea de quejas y denuncias de la secretaria de Turismo del Estado de Chiapas</h2>
     </div>
     <div class="row d-flex justify-content-center">
         <div class="col-md-8">
@@ -42,20 +44,22 @@ if(isset($_SESSION["autentificado_sis"])) {
                     <h3>Seguimiento de solicitud</h3>
                 </div>
                 <div class="card-body">
-                    <p class="lead">Para la consulta de su denuncia ingrese unicamente el folio</p>
+                    <p class="lead">Para la consulta de su denuncia ingrese únicamente el folio</p>
                     <p class="lead">Para el seguimiento de su solicitud de queja utilice la cuenta de correo proporcionado durante su registro y el folio</p>
                     <form id="formInicio" onsubmit="return false;">
                         <div class="form-row">
                             <div class="col-md-12">
                                 <div class="form-group">
                                     <label for="txt_folio"><span class="text-danger"></span>Folio</label>
-                                    <input class="form-control" name="text_folio" id="text_folio"  value=""/>
+                                    <input class="form-control" name="text_folio" id="text_folio"
+                                           value="<?= $folio ?>"/>
                                 </div>
                             </div>
                             <div class="col-md-6">
                                 <div class="form-group">
                                     <label for="text_correo"><span class="text-danger"></span>Correo</label>
-                                    <input type="text" name="text_correo" id="text_correo"  class="form-control" value=""/>
+                                    <input type="text" name="text_correo" id="text_correo"  class="form-control"
+                                           value="<?= $correo ?>"/>
                                 </div>
                             </div>
                         </div>
