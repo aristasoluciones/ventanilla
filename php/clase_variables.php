@@ -1,4 +1,5 @@
 <?php
+require ("../config.php");
 class Variables {
 	var $BaseDatos;
 	var $Servidor;
@@ -8,10 +9,10 @@ class Variables {
 	public function opcion($opc){
 		switch($opc){
 			case 1:
-				$this->Servidor = "localhost";
-				$this->BaseDatos = "turismo";
-				$this->Usuario = "root";
-				$this->Clave = "";
+				$this->Servidor = DB_HOST;
+				$this->BaseDatos = DB_NAME;
+				$this->Usuario =DB_USER;
+				$this->Clave = DB_PASS;
 			break;
 			default:
 				header('Location: http://demosistema.com/turismo/ventanilla');
