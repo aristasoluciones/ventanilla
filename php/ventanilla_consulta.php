@@ -40,12 +40,32 @@ switch($_POST['opcion']) {
         $jsondata['items'] = $resultados;
         break;
     case 5:
-        $id_municipio = $_POST['id_municipio'] ? (int) $_POST['id_municipio'] : 0;
-        $strWhere =  'id_municipio =' . $id_municipio;
+        $id_municipio = $_POST['id_municipio'] ? (int)$_POST['id_municipio'] : 0;
+        $strWhere = 'id_municipio =' . $id_municipio;
         $resultados = @$conexion->obtenerlista($querys->getListCombo("tblc_localidad_delegacion", "id_localidad_delegacion id,
         nombre valor", $strWhere));
-        $jsondata['items'] = !is_array($resultados) ? [] :  $resultados;
+        $jsondata['items'] = !is_array($resultados) ? [] : $resultados;
         break;
-    }
+    case 6:
+        $manifestacion = $_POST['manifestacion'];
+        $id_solicitud_queja = $funcionesB->limpia($manifestacion['id_solicitud_queja']);
+        $manifestacion_row =  @$conexion->fetch_array($querys->getSolicitud($id_solicitud_queja));
+        $etapa = $_POST['etapa'];
+        $sql = "SELECT id_solicitud_queja_seguimiento, seguimiento, fecha FROM tbl_solicitud_queja_seguimiento 
+                WHERE id_solicitud_queja='".$id_solicitud_queja."'
+                AND  id_etapa_queja = " . $etapa . " ORDER BY id_solicitud_queja_seguimiento DESC LIMIT 1";
+        $row_etapa =  $conexion->fetch_array($sql);
+        if(!$row_etapa) {
+            $jsondata['resp'] = 0;
+            $jsondata['msg'] = $sql;
+        } else {
+            $manifestacion['texto_pdf'] = $row_etapa['seguimiento'];
+            $manifestacion['fecha_seguimiento'] = $row_etapa['fecha'];
+            $dato = $funcionesB->generarAcuerdoPdf($manifestacion, 'S', 2);
+            $jsondata['resp'] = 1;
+            $jsondata['file'] = base64_encode($dato);
+        }
+        break;
+}
     echo json_encode($jsondata);
 ?>

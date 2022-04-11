@@ -420,7 +420,7 @@ $url = $row['tipo'] == '1' ? 'ventanilla.queja' : 'ventanilla.denuncia';
                     headers: {
                         'Content-Type': 'application/json'
                     },
-                    body: JSON.stringify({ opcion: 16, manifestacion: this.current_manifestacion, etapa})
+                    body: JSON.stringify({ opcion: 6, manifestacion: this.current_manifestacion, etapa})
                 }).then(response => response.json())
                     .then((response) => {
                         this.loading_download_acta = false
@@ -432,10 +432,11 @@ $url = $row['tipo'] == '1' ? 'ventanilla.queja' : 'ventanilla.denuncia';
                             this.showPdfInNewTab(response.file, 'vista_previa.pdf')
                             return
                         }
+                        var name_file = 'ACTA_ADMISION_' + this.current_manifestacion.folio.replace('/', '_') + '.pdf'
                         var $a = $("<a>");
                         $a.attr("href",'data:application/pdf;base64,'+ response.file);
                         $("body").append($a);
-                        $a.attr("download","acta.pdf");
+                        $a.attr("download", name_file);
                         $a[0].click();
                         $a.remove();
                     })

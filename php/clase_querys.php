@@ -91,6 +91,7 @@ class QuerysB
                      WHERE ISNULL(a.fecha_eliminado) ".$strFiltro."  AND a.id_turista='".$_SESSION['vUsuario']['id_turista']."' ";
         return $strQuery;
     }
+
     public function getListSolicitud($inicio, $limite, $tipo = 0, $finalizado = 0) {
         $strFiltro = $tipo ? " and a.id_tipo_queja = '".$tipo."' " : "";
         $strFiltro .= $finalizado
@@ -154,6 +155,12 @@ class QuerysB
                   a.id_localidad_hecho,  
                   a.id_establecimiento_hecho,  
                   IF(a.id_establecimiento_hecho > 0, b.nombre, a.nombre_establecimiento_hecho) nombre_establecimiento,
+                  b.correo correo_establecimiento,
+                  b.nombre_representante,
+                  b.direccion,
+                  b.colonia,
+                  b.razon_social,
+                  b.rfc,
                   a.id_pais,  
                   c.nombre nombre_genero,
                   d.nombre nombre_municipio_seguimiento,
