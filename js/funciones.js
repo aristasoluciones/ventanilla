@@ -9,7 +9,11 @@ head.js("plugins/jquery/jquery.min.js","plugins/bootstrap/js/bootstrap.bundle.mi
 "https://maps.googleapis.com/maps/api/js?key=AIzaSyA2mxFO0scrEjufcAxxBwnoqNFMQmxfM4k&libraries=drawing,visualization,geometry",
 "js/scriptsGoogleMaps.js","plugins/jquery-mousewheel/jquery.mousewheel.js","dist/js/adminlte.js",
 "plugins/raphael/raphael.min.js","plugins/jquery-mapael/jquery.mapael.min.js","plugins/jquery-mapael/maps/usa_states.min.js",
+"plugins/sweetalert2/sweetalert2.min.js",
+"plugins/dropzone/dropzone.js",
+"plugins/moment/moment.min.js",
 "plugins/chart.js/Chart.min.js", "plugins/jquery-validation/jquery.validate.min.js",  "plugins/jquery-validation/localization/messages_es.min.js", function(){
 });
-var hash =  Math.random().toString(36).substr(2, 9);
-head.js("js/funciones_ventanilla.js?"+hash);
+var random_hash =  (Math.random() + 1).toString(36).substring(4)
+head.js("js/funciones_ventanilla.js?" + random_hash, "js/scriptsGoogleMaps.js")
+head.js("plugins/alpinejs/alpine.min.js")

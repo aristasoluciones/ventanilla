@@ -298,15 +298,6 @@ class FuncionesB
     //Obtiene la ip real
     function getRealIP()
     {
-        /*if(!empty($_SERVER['HTTP_CLIENT_IP'])) {
-            $ip=$this->limpia($_SERVER['HTTP_CLIENT_IP']);
-            }
-        elseif(!empty($_SERVER['HTTP_X_FORWARDED_FOR'])) {
-            $ip=$this->limpia($_SERVER['HTTP_X_FORWARDED_FOR']);
-            }
-        else {
-            $ip=$this->limpia($_SERVER['REMOTE_ADDR']);
-        }*/
         if (isset($_SERVER["HTTP_CLIENT_IP"])) {
             $ip = $this->limpia($_SERVER["HTTP_CLIENT_IP"]);
         } elseif (isset($_SERVER["HTTP_X_FORWARDED_FOR"])) {
@@ -513,6 +504,13 @@ class FuncionesB
         $subject = "Sistema de Administración de Establecimientos";
         $headers = "From:" . $from;
         return mail($to, $subject, $message, $headers);
+    }
+
+    public function realDocRoot() {
+        return realpath($_SERVER['DOCUMENT_ROOT']);
+    }
+    public function mainDocRoot() {
+        return dirname($this->realDocRoot());
     }
 
 }
