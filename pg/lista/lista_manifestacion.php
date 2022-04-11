@@ -2,14 +2,14 @@
 require_once("../../php/inicializandoDatosExterno.php");
 $pagina = isset($_POST['pagina']) ? $funciones->limpia($_POST['pagina']) : 1;
 $tipo =  $funciones->limpia($_POST['tipo']);
-$estatus =  $funciones->limpia($_POST['estatus']);
+$finalizado =  $funciones->limpia($_POST['finalizado']);
 
 $limite = 10;
 $cantenlaces = 7;
 $inicio = ($pagina - 1) * $limite;
 
-$total   = @$conexion->consultaregistro($querys->getTotalSolicitud($tipo, $estatus));
-$results = @$conexion->obtenerlista($querys->getListSolicitud($inicio, $limite, $tipo, $estatus));
+$total   = @$conexion->consultaregistro($querys->getTotalSolicitud($tipo, $finalizado));
+$results = @$conexion->obtenerlista($querys->getListSolicitud($inicio, $limite, $tipo, $finalizado));
 $items = !is_array($results) ? [] :  $results;
 $lista_estatus = [1=>'Por validar', 2=>'Validado y en seguimiento', 3=>'Improcedencia', 4=>'Finalizado'];
 ?>
@@ -24,7 +24,7 @@ $lista_estatus = [1=>'Por validar', 2=>'Validado y en seguimiento', 3=>'Improced
             <table class="table table-bordered">
                 <thead>
                 <tr>
-                    <?php if($estatus == '2') { ?>
+                    <?php if((int)$finalizado === 1) { ?>
                         <th>Tipo de manifestación</th>
                     <?php }?>
                     <th>Folio</th>
@@ -36,15 +36,19 @@ $lista_estatus = [1=>'Por validar', 2=>'Validado y en seguimiento', 3=>'Improced
                 </thead>
                 <tbody>
                 <?php foreach($items as $item) {
-                    switch ((int)$item->estatus) {
-                        case 1: $bag_estatus = "<small class='badge badge-primary'>".$lista_estatus[(int)$item->estatus]."</small>"; break;
-                        case 2: $bag_estatus = "<small class='badge badge-info'>".$lista_estatus[(int)$item->estatus]."</small>"; break;
-                        case 3: $bag_estatus = "<small class='badge badge-danger'>".$lista_estatus[(int)$item->estatus]."</small>"; break;
-                        case 4: $bag_estatus = "<small class='badge badge-success'>".$lista_estatus[(int)$item->estatus]."</small>"; break;
+                    switch ((int)$item->id_etapa_queja) {
+                        case 1: $bag_estatus = "<small class='badge badge-primary'>".$item->etapa."</small>"; break;
+                        case 2:$bag_estatus = "<small class='badge badge-warning'>".$item->etapa."</small>";break;
+                        case 3: $bag_estatus = "<small class='badge badge-info'>".$item->etapa."</small>"; break;
+                        case 4: $bag_estatus = "<small class='badge badge-info'>".$item->etapa."</small>"; break;
+                        case 5: $bag_estatus = "<small class='badge badge-success'>".$item->etapa."</small>"; break;
+                        case 6: $bag_estatus = "<small class='badge badge-success'>".$item->etapa."</small>"; break;
+                        case 7: $bag_estatus = "<small class='badge badge-warning'>".$item->etapa."</small>"; break;
+                        case 8: $bag_estatus = "<small class='badge badge-success'>".$item->etapa."</small>"; break;
                     }
                     ?>
                     <tr>
-                        <?php if($estatus == '2') { ?>
+                        <?php if((int)$finalizado == 1) { ?>
                             <td><?= $item->nombre_manifestacion ?></td>
                         <?php }?>
                         <td><?= $item->folio ?></td>

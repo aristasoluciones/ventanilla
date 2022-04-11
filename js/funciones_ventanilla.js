@@ -15,6 +15,7 @@ let id_m;
 let opcion_m;
 let modalOk = 0;
 let modalCatOk = 0;
+Dropzone.autoDiscover = false
 
 function cargarMenu(pagina){
     $('#ContenidoGeneral .card').append(overlayTemplate);
@@ -74,54 +75,31 @@ function guardar_seguimiento () {
     })
 }
 
-function cargar_listado_manifestacion (pagina, tipo, estatus= 0) {
+function cargar_listado_manifestacion (pagina, tipo, finalizado= 0) {
     $.ajax({
         beforeSend: function() {
             $("#content-lista").html(cargar)
         },
         type:    "post",
         url:      web_root + '/pg/lista/lista_manifestacion.php',
-        data:    { tipo, pagina, estatus },
-        success: function(data){
-            console.log(data)
+        data:    { tipo, pagina, finalizado },
+        success: function(data) {
             $("#content-lista").html(data)
         }
     })
 }
 
-function open_modal_seguimiento (id) {
-    if(id === 0) {
-        $('#modal-default').modal('hide')
-        return;
-    }
-
-    url    = web_root + '/pg/modal_seguimiento.php'
-    $('div.modal-dialog').css({'max-width':'60%'})
-    params = {'id':id}
-    $.ajax({
-        beforeSend: function() {
-            $("#modal-content-default").trigger('create')
-            $('#modal-default').modal('show')
-            $("#modal-content-default").html(overlay)
-        },
-        type:    "post",
-        url:     url,
-        data:    params,
-        success: function(data) {
-            $("#modal-content-default").html(data)
-        }
-    })
-}
 function close_modal() {
     $("#modal-content-default").html()
     $('#modal-default').modal('hide')
 
 }
+
 function mostrar_mensaje(titulo, mensaje, color='danger'){
     $(this).Toasts('create', {
         title: titulo,
         body: mensaje,
-        icon: 'fas fa-exclamation-triangle',
+        icon: color === 'success' ? 'fas fa-check' : 'fas fa-exclamation-triangle',
         autoremove: true,
         delay: 4000,
         close: false,
@@ -130,5 +108,23 @@ function mostrar_mensaje(titulo, mensaje, color='danger'){
     });
 }
 
+// funciones seguimiento
+function ventanilla_seguimiento(id = 0) {
+    $.ajax({
+        beforeSend: function () {
+            $('#card_denuncia').append(overlay);
+        },
+        url: web_root + '/pg/seguimiento_manifestacion.php',
+        type: "post",
+        dataType: "html",
+        data: {'id': id},
+        success: function (resp) {
+            $('#card_denuncia').find('.overlay').remove();
+            $("#ContenidoGeneral").html(resp);
+        }
+    });
+}
+
+// eventos
 $(document).on('click', '#btn-logout', logout);
 $(document).on('click', '#btn-guardar-seguimiento', guardar_seguimiento);
