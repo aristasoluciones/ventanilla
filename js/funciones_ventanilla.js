@@ -136,7 +136,7 @@ function open_modal_historia_seguimiento(id=0){
         beforeSend: function() {
             $("#modalContent").trigger('create')
             $('#modal-default').modal('show')
-            $("#modalContent").html(overlayTemplate_v)
+            $("#modalContent").html(overlay)
         },
         type:    "post",
         url:     url,
@@ -154,7 +154,7 @@ function list_modal_historia_seguimiento(id=0){
     params = {'id':id}
     $.ajax({
         beforeSend: function() {
-            $("#list-historia").html(cargar_v)
+            $("#list-historia").html(cargar)
         },
         type:    "post",
         url:     url,
