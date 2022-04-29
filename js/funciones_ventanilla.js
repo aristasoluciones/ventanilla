@@ -129,7 +129,7 @@ function open_modal_historia_seguimiento(id=0){
     if(id === 0)
         $('#modal-default').modal('hide')
 
-    url    = 'pg/ventanilla/modal_historia_seguimiento.php'
+    url    = 'pg/modal_historia_seguimiento.php'
     $('div.modal-dialog').css({'max-width':'50%'})
     params = {'id':id}
     $.ajax({
@@ -150,7 +150,7 @@ function open_modal_historia_seguimiento(id=0){
 
 function list_modal_historia_seguimiento(id=0){
     if (!id) return
-    url    = 'pg/ventanilla/lista/lista_historia_seguimiento.php'
+    url    = 'pg/lista/lista_historia_seguimiento.php'
     params = {'id':id}
     $.ajax({
         beforeSend: function() {
