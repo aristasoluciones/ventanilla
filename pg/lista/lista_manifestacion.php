@@ -22,9 +22,7 @@ $items = !is_array($results) ? [] :  $results;
             <table class="table table-bordered">
                 <thead>
                 <tr>
-                    <?php if((int)$finalizado === 1) { ?>
-                        <th>Tipo de manifestación</th>
-                    <?php }?>
+                    <th>Tipo de solicitud</th>
                     <th>Folio</th>
                     <th>Nombre</th>
                     <th>Fecha</th>
@@ -46,9 +44,7 @@ $items = !is_array($results) ? [] :  $results;
                     }
                     ?>
                     <tr>
-                        <?php if((int)$finalizado == 1) { ?>
-                            <td><?= $item->nombre_manifestacion ?></td>
-                        <?php }?>
+                        <td><?= $item->nombre_manifestacion ?></td>
                         <td><?= $item->folio ?></td>
                         <td><?= $item->anonima == '1' ? 'Anónima' : $item->nombre . " " . $item->apellidos; ?></td>
                         <td><?= $item->fecha_queja ?></td>

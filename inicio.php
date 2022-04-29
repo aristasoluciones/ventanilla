@@ -38,14 +38,7 @@ require('php/inicializandoDatos.php');
     <script src="js/head.min.js"></script>
 </head>
 <body class="hold-transition layout-top-nav">
-<div class="modal fade" id="modal-default">
-    <div class="modal-dialog">
-        <div class="modal-content" id="modal-content-default">
-        </div>
-        <!-- /.modal-content -->
-    </div>
-    <!-- /.modal-dialog -->
-</div>
+
 <!-- /.modal -->
 <div class="wrapper">
     <?php include_once('pg/menu_cabeza.php'); ?>
@@ -68,7 +61,6 @@ require('php/inicializandoDatos.php');
     <div class="modal fade" id="modal-default">
         <div class="modal-dialog">
             <div class="modal-content"  id="modalContent">
-
             </div>
             <!-- /.modal-content -->
         </div>

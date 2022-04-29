@@ -33,16 +33,16 @@ $correo = $_POST['correo'] ?? '';
     <link rel="stylesheet" href="dist/css/adminlte.min.css">
 </head>
 <body class="hold-transition bg-light">
-<div class="container">
-    <div class="modal fade" id="modal-default">
-        <div class="modal-dialog">
-            <div class="modal-content"  id="modalContent">
+<div class="modal fade" id="modal-default">
+    <div class="modal-dialog">
+        <div class="modal-content"  id="modalContent">
 
-            </div>
-            <!-- /.modal-content -->
         </div>
-        <!-- /.modal-dialog -->
+        <!-- /.modal-content -->
     </div>
+    <!-- /.modal-dialog -->
+</div>
+<div class="container">
     <div class="py-5 text-center">
         <h2>Seguimiento en línea de quejas y denuncias de la secretaria de Turismo del Estado de Chiapas</h2>
     </div>
