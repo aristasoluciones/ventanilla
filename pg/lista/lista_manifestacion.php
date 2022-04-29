@@ -72,7 +72,7 @@ $items = !is_array($results) ? [] :  $results;
                                     <a href="javascript:;"
                                        class="btn btn-success"
                                        title="Recurso de consideración">
-                                        <i class="fa fa-box-archive"></i>
+                                        <i class="fa fa-box"></i>
                                     </a>
                                 <?php } ?>
                             </div>
