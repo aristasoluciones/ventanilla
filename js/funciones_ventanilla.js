@@ -125,6 +125,46 @@ function ventanilla_seguimiento(id = 0) {
     });
 }
 
+function open_modal_historia_seguimiento(id=0){
+    if(id === 0)
+        $('#modal-default').modal('hide')
+
+    url    = 'pg/ventanilla/modal_historia_seguimiento.php'
+    $('div.modal-dialog').css({'max-width':'50%'})
+    params = {'id':id}
+    $.ajax({
+        beforeSend: function() {
+            $("#modalContent").trigger('create')
+            $('#modal-default').modal('show')
+            $("#modalContent").html(overlayTemplate_v)
+        },
+        type:    "post",
+        url:     url,
+        data:    params,
+        success: function(data){
+            $("#modalContent").html(data)
+            list_modal_historia_seguimiento(id)
+        }
+    })
+}
+
+function list_modal_historia_seguimiento(id=0){
+    if (!id) return
+    url    = 'pg/ventanilla/lista/lista_historia_seguimiento.php'
+    params = {'id':id}
+    $.ajax({
+        beforeSend: function() {
+            $("#list-historia").html(cargar_v)
+        },
+        type:    "post",
+        url:     url,
+        data:    params,
+        success: function(data){
+            $("#list-historia").html(data)
+        }
+    })
+}
+
 // eventos
 $(document).on('click', '#btn-logout', logout);
 $(document).on('click', '#btn-guardar-seguimiento', guardar_seguimiento);

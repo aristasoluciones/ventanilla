@@ -75,7 +75,29 @@ class QuerysB
         $strQuery .= " ORDER BY valor";
         return $strQuery;
     }
+    public function getListHistoriaSolicitud($id) {
 
+        $strQuery  = "SELECT a.id_solicitud_queja_seguimiento, 
+                  DATE_FORMAT(a.fecha_registro, '%d/%m/%Y') as fecha, 
+                  a.seguimiento, a.id_etapa_queja, 
+                  c.nombre as nombre_usuario,
+                  b.nombre as etapa,
+                  a.id_usuario,
+                  a.comentario_etapa,
+                  a.tipo_usuario
+                  FROM tbl_solicitud_queja_seguimiento a
+                  INNER JOIN tblc_etapa_queja b ON a.id_etapa_queja = b.id_etapa_queja 
+                  LEFT JOIN tbl_usuario c ON a.id_usuario = c.id_usuario 
+                  WHERE a.fecha_eliminado is null and a.id_solicitud_queja = '".$id."' ORDER BY a.fecha_registro DESC";
+        return $strQuery;
+    }
+
+    public function getUsuarioPrestadorDoSeguimiento($id) {
+        $sql = "SELECT nombre, apellidos  FROM tbl_solicitud_queja_seguimiento a
+            INNER JOIN tbl_establecimiento_usuario b ON a.id_usuario = b.id_establecimiento_usuario
+            WHERE id_solicitud_queja_seguimiento= '".$id."' ";
+        return $sql;
+    }
     public function getTotalSolicitud ($tipo = 0) {
         $strFiltro = $tipo ? " and a.id_tipo_queja = '".$tipo."' " : "";
 

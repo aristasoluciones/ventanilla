@@ -226,6 +226,21 @@ $url = $row['tipo'] == '1' ? 'ventanilla.queja' : 'ventanilla.denuncia';
                 ? seguimiento_corriente.seguimiento
                 : ''
             },
+            get controlActaFinal() {
+                var valor = false;
+                if (this.current_manifestacion.pila_seguimiento !== null) {
+                    const pila_seguimiento =  JSON.parse(this.current_manifestacion.pila_seguimiento)
+                    const pila_seguimiento_filtrado  = pila_seguimiento.filter((item) =>  {
+                        return [7].includes(parseInt(item.id_etapa_queja))
+                    })
+                    const existe_etapa =  pila_seguimiento_filtrado.length
+                    if (existe_etapa && this.current_manifestacion.id_etapa_queja != pila_seguimiento_filtrado[0].id_etapa_queja) {
+                        const seguimiento_json = JSON.parse(pila_seguimiento_filtrado[0].seguimiento)
+                        valor = typeof seguimiento_json.acta_generada !== 'undefined' && seguimiento_json.acta_generada
+                    }
+                }
+                return valor;
+            },
             inicializar (param) {
                 this.loadPais()
                 this.loadMunicipio()
