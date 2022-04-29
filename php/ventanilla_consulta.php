@@ -66,6 +66,27 @@ switch($_POST['opcion']) {
             $jsondata['file'] = base64_encode($dato);
         }
         break;
-}
+    case 7:
+        $manifestacion = $_POST['manifestacion'];
+        $etapa = $_POST['etapa'];
+        $sql = "SELECT seguimiento, fecha 
+                FROM tbl_solicitud_queja_seguimiento 
+                WHERE id_solicitud_queja='".$manifestacion['id_solicitud_queja']."'
+                AND  id_etapa_queja = " . $etapa . " ORDER BY id_solicitud_queja_seguimiento DESC LIMIT 1";
+        $row_etapa =  $conexion->fetch_array($sql);
+
+        if(!$row_etapa) {
+            $jsondata['resp'] = 0;
+            $jsondata['msg'] = $sql;
+        } else {
+            $seguimiento =  json_decode($row_etapa['seguimiento'], true);
+            $manifestacion['texto_pdf'] = $seguimiento['contenido_acta']['texto'];
+            $manifestacion['fecha_seguimiento'] = $seguimiento['contenido_acta']['fecha'];
+            $dato = $funcionesB->generarAcuerdoPdf($manifestacion, 'S', 2);
+            $jsondata['resp'] = 1;
+            $jsondata['file'] = base64_encode($dato);
+        }
+        break;
+    }
     echo json_encode($jsondata);
 ?>

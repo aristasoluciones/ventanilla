@@ -7,19 +7,14 @@ if ($id > 0) {
     $row = $conexion->fetch_array($querys->getSolicitud($id));
 }
 $tabConciliacion = false;
-$tabEvidenciaPrestador = false;
 $tabResolucion = false;
-$tabFin = false;
-
 if($row) {
     $seguimientos = json_decode($row['pila_seguimiento'], true);
     $id_seguimientos = array_column($seguimientos, 'id_etapa_queja');
     switch((int)$row['tipo']) {
         case 1:
             $tabConciliacion = in_array(4, $id_seguimientos);
-            $tabEvidenciaPrestador = in_array(5, $id_seguimientos);
             $tabResolucion = in_array(7, $id_seguimientos);
-            $tabFin = in_array(8, $id_seguimientos);
             break;
     }
 }
@@ -88,6 +83,24 @@ $url = $row['tipo'] == '1' ? 'ventanilla.queja' : 'ventanilla.denuncia';
                                         Evidencias presentadas
                                     </a>
                                 </li>
+                                <?php if($tabConciliacion) { ?>
+                                    <li class="nav-item">
+                                        <a class="nav-link" id="dato_denuncia_5"
+                                           data-toggle="pill" href="#dtab_5" role="tab"
+                                           aria-controls="Stab_5" aria-selected="false">
+                                            Cierre por Conciliacíon
+                                        </a>
+                                    </li>
+                                <?php } ?>
+                                <?php if($tabResolucion) { ?>
+                                    <li class="nav-item">
+                                        <a class="nav-link" id="dato_denuncia_7"
+                                           data-toggle="pill" href="#dtab_7" role="tab"
+                                           aria-controls="stab_7" aria-selected="false">
+                                            Cierre por Resolución
+                                        </a>
+                                    </li>
+                                <?php } ?>
                             </ul>
                             <div class="tab-content">
                                 <div class="tab-pane fade show active" id="dtab_1"
@@ -108,9 +121,17 @@ $url = $row['tipo'] == '1' ? 'ventanilla.queja' : 'ventanilla.denuncia';
                                         <?php include_once('formulario/form_validacion_aceptacion_manifestacion.php'); ?>
                                     </div>
                                 </div>
-                                <?php if($tabFin)  { ?>
-                                    <div class="tab-pane fade" id="dtab_6"
-                                         role="tabpanel" aria-labelledby="dtab_6" disabled>
+                                <?php if($tabConciliacion)  { ?>
+                                    <div class="tab-pane fade" id="dtab_5"
+                                         role="tabpanel" aria-labelledby="dtab_5" disabled>
+                                        <div class="container p-2">
+                                            <?php include_once('formulario/form_finalizacion.php'); ?>
+                                        </div>
+                                    </div>
+                                <?php } ?>
+                                <?php if($tabResolucion)  { ?>
+                                    <div class="tab-pane fade" id="dtab_7"
+                                         role="tabpanel" aria-labelledby="dtab_7" disabled>
                                         <div class="container p-2">
                                             <?php include_once('formulario/form_finalizacion.php'); ?>
                                         </div>
@@ -384,31 +405,27 @@ $url = $row['tipo'] == '1' ? 'ventanilla.queja' : 'ventanilla.denuncia';
             },
             async descargarActaFinal (preview = 0) {
                 this.loading_download_acta = true
-                fetch(this.path_site + '/php/ventanilla_consulta.php', {
+                var etapa = parseInt(this.current_manifestacion.tipo) === 1
+                    ? 7
+                    : 0;
+                const peticion = await fetch(this.path_site+ '/php/ventanilla_consulta.php', {
                     method: 'post',
                     headers: {
                         'Content-Type': 'application/json'
                     },
-                    body: JSON.stringify({ opcion: 17, manifestacion: this.current_manifestacion})
-                }).then(response => response.json())
-                    .then((response) => {
-                        this.loading_download_acta = false
-                        if(response.resp === 0) {
-                            mensaje_ventanilla('Campo requerido', 'Hubo un error al descargar')
-                            return
-                        }
-                        if (preview) {
-                            this.showPdfInNewTab(response.file, 'vista_previa.pdf')
-                            return
-                        }
-                        var name_file = 'ACTA_' + this.current_manifestacion.folio.replace('/', '_') + '.pdf'
-                        var $a = $("<a>");
-                        $a.attr("href",'data:application/pdf;base64,'+ response.file);
-                        $("body").append($a);
-                        $a.attr("download", name_file);
-                        $a[0].click();
-                        $a.remove();
-                    })
+                    body: JSON.stringify({
+                        opcion: 7,
+                        etapa,
+                        manifestacion: this.current_manifestacion})
+                })
+                const response =  await peticion.json()
+                this.loading_download_acta = false
+                if(response.resp === 0) {
+                    mensaje_ventanilla('Error!.', 'Hubo un error al descargar')
+                    return
+                }
+                (preview) ? this.showPdfInNewTab(response.file, 'ACT_FINAL.pdf')
+                    : this.dowloadFile(response.file, 'ACTA_FINAL_')
             },
             async descargarActaAdmision (preview=0) {
                 var etapa = parseInt(this.current_manifestacion.tipo) === 1
@@ -516,11 +533,6 @@ $url = $row['tipo'] == '1' ? 'ventanilla.queja' : 'ventanilla.denuncia';
                     }
                 })
             },
-            showPdfInNewTab(base64Data, fileName) {
-                let pdfWindow = window.open("");
-                pdfWindow.document.write("<html<head><title>"+fileName+"</title><style>body{margin: 0px;}iframe{border-width: 0px;}</style></head>");
-                pdfWindow.document.write("<body><embed width='100%' height='100%' src='data:application/pdf;base64, " + encodeURI(base64Data)+"#toolbar=0&navpanes=0&scrollbar=0'></embed></body></html>");
-            },
             initMapa() {
                 var coordenada_inicial = null
                 var opcionesMapa = {
@@ -560,6 +572,20 @@ $url = $row['tipo'] == '1' ? 'ventanilla.queja' : 'ventanilla.denuncia';
                 var lat = coordenada.lat;
                 var lng = coordenada.lng
                 this.current_manifestacion.coordenada_lugar_hecho = lat + ',' + lng
+            },
+            showPdfInNewTab(base64Data, fileName) {
+                let pdfWindow = window.open("");
+                pdfWindow.document.write("<html<head><title>"+fileName+"</title><style>body{margin: 0px;}iframe{border-width: 0px;}</style></head>");
+                pdfWindow.document.write("<body><embed width='100%' height='100%' src='data:application/pdf;base64, " + encodeURI(base64Data)+"#toolbar=0&navpanes=0&scrollbar=0'></embed></body></html>");
+            },
+            dowloadFile (base64Data, prefixName) {
+                var name_file = prefixName + this.current_manifestacion.folio.replace('/', '_') + '.pdf';
+                var $a = $("<a>");
+                $a.attr("href",'data:application/pdf;base64,'+ base64Data);
+                $("body").append($a);
+                $a.attr("download", name_file);
+                $a[0].click();
+                $a.remove();
             }
         }
     }
