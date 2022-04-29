@@ -76,11 +76,8 @@ class QuerysB
         return $strQuery;
     }
 
-    public function getTotalSolicitud ($tipo = 0, $finalizado =  0) {
+    public function getTotalSolicitud ($tipo = 0) {
         $strFiltro = $tipo ? " and a.id_tipo_queja = '".$tipo."' " : "";
-        $strFiltro .= $finalizado
-            ? " and a.id_etapa_queja IN(8) "
-            : " and a.id_etapa_queja NOT IN (8) ";
 
         $strQuery = "SELECT count(a.id_solicitud_queja) total
                      FROM (select sa.*, sb.tipo from tbl_solicitud_queja sa join tblc_tipo_queja sb on sa.id_tipo_queja=sb.id_tipo_queja)  a
@@ -92,11 +89,8 @@ class QuerysB
         return $strQuery;
     }
 
-    public function getListSolicitud($inicio, $limite, $tipo = 0, $finalizado = 0) {
+    public function getListSolicitud($inicio, $limite, $tipo = 0) {
         $strFiltro = $tipo ? " and a.id_tipo_queja = '".$tipo."' " : "";
-        $strFiltro .= $finalizado
-            ? " and a.id_etapa_queja IN(8) "
-            : " and a.id_etapa_queja NOT IN (8) ";
 
         $strQuery  = "SELECT a.id_solicitud_queja,a.folio, a.nombre, a.apellidos, date_format(a.fecha_queja, '%d/%m/%Y') fecha_queja,
                   a.id_etapa_queja, c.nombre as nacionalidad, d.nombre as etapa, b.nombre as lugar,e.nombre as localidad,

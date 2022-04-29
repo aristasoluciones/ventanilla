@@ -1,8 +1,11 @@
-<div class="row" x-show="[8].includes(parseInt(current_manifestacion.id_etapa_queja))">
-    <div class="col-md-12 text-center" x-show="loading_download_acta">
+<div class="row"
+     x-show="controlActaFinal">
+    <div class="col-md-12 text-center"
+         x-show="loading_download_acta">
         <div class='text-center'><i class='fas fa-1x fa-sync fa-spin'></i></div>
     </div>
-    <div class="col-md-12" x-show="!loading_download_acta">
+    <div class="col-md-12"
+         x-show="!loading_download_acta">
         <div class="form-group" >
             <div class="btn-group">
                 <button
@@ -19,3 +22,4 @@
         </div>
     </div>
 </div>
+

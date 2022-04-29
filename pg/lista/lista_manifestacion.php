@@ -2,16 +2,14 @@
 require_once("../../php/inicializandoDatosExterno.php");
 $pagina = isset($_POST['pagina']) ? $funciones->limpia($_POST['pagina']) : 1;
 $tipo =  $funciones->limpia($_POST['tipo']);
-$finalizado =  $funciones->limpia($_POST['finalizado']);
 
 $limite = 10;
 $cantenlaces = 7;
 $inicio = ($pagina - 1) * $limite;
 
-$total   = @$conexion->consultaregistro($querys->getTotalSolicitud($tipo, $finalizado));
-$results = @$conexion->obtenerlista($querys->getListSolicitud($inicio, $limite, $tipo, $finalizado));
+$total   = @$conexion->consultaregistro($querys->getTotalSolicitud($tipo));
+$results = @$conexion->obtenerlista($querys->getListSolicitud($inicio, $limite, $tipo));
 $items = !is_array($results) ? [] :  $results;
-$lista_estatus = [1=>'Por validar', 2=>'Validado y en seguimiento', 3=>'Improcedencia', 4=>'Finalizado'];
 ?>
 <div class="col-md-12">
     <div class="card card-success border-info">
@@ -70,8 +68,14 @@ $lista_estatus = [1=>'Por validar', 2=>'Validado y en seguimiento', 3=>'Improced
                                    title="Historial seguimiento">
                                     <i class="fa fa-history"></i>
                                 </a>
+                                <?php if($item->finalizado) { ?>
+                                    <a href="javascript:;"
+                                       class="btn btn-success"
+                                       title="Recurso de consideración">
+                                        <i class="fa fa-box-archive"></i>
+                                    </a>
+                                <?php } ?>
                             </div>
-
                         </td>
                     </tr>
                 <?php } ?>
