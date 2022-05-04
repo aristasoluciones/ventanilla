@@ -21,15 +21,27 @@
             $path_base = $funciones->mainDocRoot();
             $path_base = str_replace('\\', '/', $path_base)."/turismo";
             $carpeta_destino = 'archivos/ventanilla/quejas_denuncias';
-            $dir_destino = $path_base . $carpeta_destino;
+            $dir_destino = $path_base .'/'. $carpeta_destino;
             if (!is_dir($dir_destino))
-                mkdir($dir_destino, 0777, true);
+                mkdir($dir_destino, 0755, true);
 
             $sql = "SELECT evidencia from tbl_solicitud_queja
                     WHERE id_solicitud_queja = '" . $id . "' ";
             $current = $conexion->fetch_objet($sql);
-            $archivos = $current->evidencia != '' ? json_decode($current->evidencia, true) : [];
-            $archivos = is_array($archivos) ? $archivos : [];
+            $archivos = [];
+            $archivos_corrientes = $current->evidencia != '' ? json_decode($current->evidencia, true) : [];
+            $archivos_corrientes = is_array($archivos_corrientes) ? $archivos_corrientes : [];
+            // barrido de archivos para idetificar inexistentes.
+            foreach ($archivos_corrientes as $key => $archivo_corriente) {
+                $archivo_corriente = !is_array($archivo_corriente) ? [] : $archivo_corriente;
+                foreach ($archivo_corriente as $item) {
+                    if (is_file($path_base.$item['path'])) {
+                        if (!isset($archivos[$key]))
+                            $archivos[$key] = [];
+                        array_push($archivos[$key], $item);
+                    }
+                }
+            }
             if ($_FILES['file']['error'] === UPLOAD_ERR_OK) {
                 $file_name = $_FILES['file']['name'];
                 $extension_name = explode('.', $file_name);

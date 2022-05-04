@@ -231,21 +231,21 @@
         </table>
     </div>
 </div>
-<div class="row" x-show="prevencionPendiente && prevencionVigente">
-    <p class="text-danger text-bold">Tiene una preveción pendiente que atender</p>
-</div>
-<div class="row" x-show="prevencionPendiente && !prevencionVigente">
-    <p class="text-bold" style="color: darkorange">Estimado Turista o Visitante, el plazo para subsanar la omisión, ha vencido.</p>
+<div class="row">
+    <div class="col-md-12">
+        <div class="callout callout-danger"
+             x-show="prevencionPendiente && prevencionVigente">
+            <p x-show="prevencionVigente">Esta solicitud cuenta con una prevención pendiente por atender.</p>
+            <p x-show="!prevencionVigente">La prevención notificada a esta solicitud se ha cerrado por plazo vencido.</p>
+        </div>
+    </div>
 </div>
 <div class="row" x-show="prevencionPendiente">
     <div class="col-12">
-        <div class="form-group">
-            <label>Motivo de la prevencíon</label>
-            <textarea readonly
-                      class="form-control"
-                      x-text="textoPrevencion"></textarea>
+        <div class="callout callout-danger">
+            <label>Motivo de prevención</label>
+            <div x-html="textoPrevencion"></div>
         </div>
-
     </div>
 </div>
 <div class="row">

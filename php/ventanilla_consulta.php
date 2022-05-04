@@ -19,6 +19,27 @@ switch($_POST['opcion']) {
     case 1:
         $id = $funcionesB->limpia($_POST['id']);
         $row = $conexion->fetch_objet($querys->getSolicitud($id));
+
+        $evidencias = [];
+        $evidencias_filtradas = [];
+        if ($row) {
+            $evidencias  = json_decode($row->evidencia, true);
+        }
+        $path_base = $funcionesB->mainDocRoot();
+        $path_base = str_replace('\\', '/', $path_base)."/turismo";
+        foreach ($evidencias as $key => $evidencia) {
+            $evidencia = !is_array($evidencia) ? [] : $evidencia;
+            foreach ($evidencia as $item) {
+                if (is_file($path_base.$item['path'])) {
+                    if (!isset($evidencias_filtradas[$key]))
+                        $evidencias_filtradas[$key] = [];
+                    array_push($evidencias_filtradas[$key], $item);
+                }
+
+            }
+        }
+
+        $row->evidencia =  json_encode($evidencias_filtradas);
         $jsondata['data'] = $row;
         break;
     case 2:
