@@ -1,7 +1,7 @@
     <div class="row">
         <div class="col-md-4">
             <div class="form-group">
-                <label for="nombre"><span class="text-danger"></span>Prestador de servicio</label>
+                <label><span class="text-danger"></span>Prestador de servicio</label>
                 <select :disabled="!prevencionPendiente || !prevencionVigente"
                         data-rule-required="true"
                         x-ref="select_establecimiento"
@@ -15,7 +15,7 @@
         </div>
         <div class="col-md-4">
             <div class="form-group">
-                <label for="nombre"><span class="text-danger"></span>Lugar de los hechos</label>
+                <label><span class="text-danger"></span>Lugar de los hechos</label>
                 <select :disabled="!prevencionPendiente || !prevencionVigente"
                         data-rule-required="true"
                         x-ref="select_municipio_hecho"
@@ -28,7 +28,7 @@
         </div>
         <div class="col-md-4">
             <div class="form-group">
-                <label for="nombre"><span class="text-danger"></span>Localidad de los hechos</label>
+                <label><span class="text-danger"></span>Localidad de los hechos</label>
                 <select :disabled="!prevencionPendiente || !prevencionVigente"
                         data-rule-required="true"
                         x-ref="select_localidad_hecho"
