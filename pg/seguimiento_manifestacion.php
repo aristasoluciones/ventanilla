@@ -10,11 +10,11 @@ $tabConciliacion = false;
 $tabResolucion = false;
 if ($row) {
     $seguimientos = json_decode($row['pila_seguimiento'], true);
-    $id_seguimientos = array_column($seguimientos, 'id_etapa_queja');
+    $idSeguimientos = array_column($seguimientos, 'id_etapa_queja');
     switch ((int)$row['tipo']) {
         case 1:
-            $tabConciliacion = in_array(4, $id_seguimientos);
-            $tabResolucion = in_array(7, $id_seguimientos);
+            $tabConciliacion = in_array(4, $idSeguimientos);
+            $tabResolucion = in_array(8, $idSeguimientos);
             break;
     }
 }
@@ -43,7 +43,7 @@ $url = $row['tipo'] == '1' ? 'ventanilla.queja' : 'ventanilla.denuncia';
     <div class="container-fluid">
         <div class="row">
             <?php if ($row) { ?>
-                <div class="col-md-12" x-data="ComponenteSeguimiento()" x-init="inicializar(<?= $id ?>)">
+                <div class="col-md-12" x-data="ComponenteSeguimiento()" x-init="await inicializar(<?= $id ?>)">
                     <div class="card card-success">
                         <div class="card-header width-border">
                             <h3 class="card-title">Seguimiento de solicitud</h3>
@@ -66,7 +66,7 @@ $url = $row['tipo'] == '1' ? 'ventanilla.queja' : 'ventanilla.denuncia';
                                     <a class="nav-link active" id="dato_general_1"
                                        data-toggle="pill" href="#dtab_1" role="tab"
                                        aria-controls="Stab_1" aria-selected="true">
-                                        Información general
+                                        Datos generales
                                     </a>
                                 </li>
                                 <li class="nav-item">
@@ -170,37 +170,16 @@ $url = $row['tipo'] == '1' ? 'ventanilla.queja' : 'ventanilla.denuncia';
             lista_municipio_hecho: [],
             lista_localidad_hecho: [],
             lista_establecimiento: [],
-            tipo_respuesta_etapa: null,
-            tipo_aceptacion_pp: null,
-            texto_aceptacion_pp: null,
             current_manifestacion: {
                 evidencia: [],
-                evidencia_prestador: [],
-                texto_acuerdo: null,
-                texto_motivo_improcedencia: null,
-                texto_conciliacion_resolucion: null,
                 finalizado: 0,
                 seguimiento_corriente: null,
                 pila_seguimiento: null,
             },
             loading: false,
-            loading_ap_prestador: false,
-            loading_conciliacion: false,
             loading_download_acta: false,
             evidencia: [],
-            texto_acta: null,
             dropzones: [],
-            get controlActaAceptacion() {
-                var valor = false;
-                if (this.current_manifestacion.pila_seguimiento !== null) {
-                    var pila_seguimiento = JSON.parse(this.current_manifestacion.pila_seguimiento)
-                    var pila_seguimiento_filtrado = pila_seguimiento.filter((item) => {
-                        return item.id_etapa_queja === 3
-                    })
-                    valor = pila_seguimiento_filtrado.length > 0
-                }
-                return valor;
-            },
             get enPrevencion() {
                 return [2].includes(parseInt(this.current_manifestacion.id_etapa_queja))
             },
@@ -223,27 +202,65 @@ $url = $row['tipo'] == '1' ? 'ventanilla.queja' : 'ventanilla.denuncia';
                 }
                 return flag
             },
-            get textoPrevencion() {
-                var seguimiento_corriente = JSON.parse(this.current_manifestacion.seguimiento_corriente)
-                return this.prevencionPendiente
-                    ? seguimiento_corriente.seguimiento
-                    : ''
+
+            get listaActaFirmadaAdmisionSolicitud () {
+                let seguimiento = this.getListaSeguimientoFiltrado([1])
+                return this.pilaActaFirmada(seguimiento)
             },
-            get controlActaFinal() {
-                var valor = false;
-                if (this.current_manifestacion.pila_seguimiento !== null) {
-                    const pila_seguimiento = JSON.parse(this.current_manifestacion.pila_seguimiento)
-                    const pila_seguimiento_filtrado = pila_seguimiento.filter((item) => {
-                        return [7].includes(parseInt(item.id_etapa_queja))
-                    })
-                    const existe_etapa = pila_seguimiento_filtrado.length
-                    if (existe_etapa && this.current_manifestacion.id_etapa_queja != pila_seguimiento_filtrado[0].id_etapa_queja) {
-                        const seguimiento_json = JSON.parse(pila_seguimiento_filtrado[0].seguimiento)
-                        valor = typeof seguimiento_json.acta_generada !== 'undefined' && seguimiento_json.acta_generada
+
+            pilaActaFirmada (seguimiento) {
+                let pila_acta = []
+
+                if (!seguimiento.length)
+                    return pila_acta
+
+                if (!this.isJSON(seguimiento[0].seguimiento))
+                    return pila_acta
+
+                let seguimiento_json = JSON.parse(seguimiento[0].seguimiento)
+
+                if (!seguimiento_json.pila_acta.length)
+                    return pila_acta
+
+                let lista_acta = seguimiento_json.pila_acta
+                pila_acta =  lista_acta.filter( (item) => (typeof item.path_acta_firmada !== 'undefined'))
+
+                pila_acta.forEach((item) => {
+                    let nombre = "Acta"
+                    switch (parseInt(item.tipo)) {
+                        case 1:
+                            nombre = 'Acta de admisión  de pruebas'
+                            if (parseInt(seguimiento[0].id_etapa_queja) === 7)
+                                nombre = 'Acta cierre de instrucción'
+                            if (parseInt(seguimiento[0].id_etapa_queja) === 8)
+                                nombre = 'Acta de resolución'
+                            break
+                        case 2: nombre = 'Acta de desechamiento de pruebas'
+                            break
+                        case 3: nombre = 'Acta de prevención'
+                            break
                     }
-                }
-                return valor;
+                    item.nombre = nombre
+                })
+
+                return pila_acta
             },
+
+            getListaSeguimiento () {
+                let pila = []
+                if(this.current_manifestacion.pila_seguimiento !== null) {
+                    pila =  JSON.parse(this.current_manifestacion.pila_seguimiento)
+                }
+                return pila
+            },
+
+            getListaSeguimientoFiltrado (etapa) {
+                let pila =  this.getListaSeguimiento()
+                return pila.filter((item) =>  {
+                    return etapa.includes(parseInt(item.id_etapa_queja))
+                })
+            },
+
             async inicializar(param) {
 
                 $(this.$refs.select_localidad_hecho).on('change.select2', (event) => {
@@ -261,9 +278,9 @@ $url = $row['tipo'] == '1' ? 'ventanilla.queja' : 'ventanilla.denuncia';
                     this.current_manifestacion.id_establecimiento_hecho = parseInt(event.target.value)
                 })
 
-                this.loadCatalogo(2)
-                this.loadCatalogo(3)
-                this.loadCatalogo(4)
+                await this.loadCatalogo(2)
+                await this.loadCatalogo(3)
+                await this.loadCatalogo(4)
 
                 const peticion = await fetch(this.path_site + '/php/ventanilla_consulta.php', {
                     method: 'post',
@@ -277,7 +294,9 @@ $url = $row['tipo'] == '1' ? 'ventanilla.queja' : 'ventanilla.denuncia';
                 this.current_manifestacion.evidencia = response.data.evidencia === null
                     ? []
                     : JSON.parse(response.data.evidencia)
+
                 this.initMapa()
+
                 $(this.$refs.select_municipio_hecho).val(response.data.id_municipio_hecho).trigger('change.select2')
                 $(this.$refs.select_pais).val(response.data.id_pais).trigger('change.select2')
                 $(this.$refs.select_establecimiento).val(response.data.id_establecimiento_hecho).trigger('change.select2')
@@ -385,6 +404,7 @@ $url = $row['tipo'] == '1' ? 'ventanilla.queja' : 'ventanilla.denuncia';
                 }
 
             },
+
             async loadLocalidad(id) {
                 let peticion = await fetch(this.path_site + '/php/ventanilla_consulta.php', {
                     method: 'post',
@@ -402,62 +422,7 @@ $url = $row['tipo'] == '1' ? 'ventanilla.queja' : 'ventanilla.denuncia';
                     allowClear: true
                 })
             },
-            async descargarActaFinal(preview = 0) {
-                this.loading_download_acta = true
-                var etapa = parseInt(this.current_manifestacion.tipo) === 1
-                    ? 7
-                    : 0;
-                const peticion = await fetch(this.path_site + '/php/ventanilla_consulta.php', {
-                    method: 'post',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({
-                        opcion: 7,
-                        etapa,
-                        manifestacion: this.current_manifestacion
-                    })
-                })
-                const response = await peticion.json()
-                this.loading_download_acta = false
-                if (response.resp === 0) {
-                    mensaje_ventanilla('Error!.', 'Hubo un error al descargar')
-                    return
-                }
-                (preview) ? this.showPdfInNewTab(response.file, 'ACT_FINAL.pdf')
-                    : this.dowloadFile(response.file, 'ACTA_FINAL_')
-            },
-            async descargarActaAdmision(preview = 0) {
-                var etapa = parseInt(this.current_manifestacion.tipo) === 1
-                    ? 3
-                    : 0;
-                this.loading_download_acta = true
-                fetch(this.path_site + '/php/ventanilla_consulta.php', {
-                    method: 'post',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({opcion: 6, manifestacion: this.current_manifestacion, etapa})
-                }).then(response => response.json())
-                    .then((response) => {
-                        this.loading_download_acta = false
-                        if (response.resp === 0) {
-                            mensaje_ventanilla('Campo requerido', 'Hubo un error al descargar')
-                            return
-                        }
-                        if (preview) {
-                            this.showPdfInNewTab(response.file, 'vista_previa.pdf')
-                            return
-                        }
-                        var name_file = 'ACTA_ADMISION_' + this.current_manifestacion.folio.replace('/', '_') + '.pdf'
-                        var $a = $("<a>");
-                        $a.attr("href", 'data:application/pdf;base64,' + response.file);
-                        $("body").append($a);
-                        $a.attr("download", name_file);
-                        $a[0].click();
-                        $a.remove();
-                    })
-            },
+
             async actualizarEnviar() {
                 const confirmacion = await Swal.fire({
                     title: '¿Esta seguro de realizar este proceso?',
@@ -506,9 +471,6 @@ $url = $row['tipo'] == '1' ? 'ventanilla.queja' : 'ventanilla.denuncia';
                     mostrar_mensaje('Exito', 'Se han actualizado correctamente la información', 'success')
                     this.current_manifestacion = {
                         ...response.data,
-                        texto_acuerdo: null,
-                        texto_motivo_improcedencia: null,
-                        texto_conciliacion_resolucion: null
                     }
                     this.current_manifestacion.evidencia = response.data.evidencia === null
                         ? []
@@ -532,6 +494,7 @@ $url = $row['tipo'] == '1' ? 'ventanilla.queja' : 'ventanilla.denuncia';
                     }
                 })
             },
+
             initMapa() {
                 var coordenada_inicial = null
                 var opcionesMapa = {
@@ -545,6 +508,7 @@ $url = $row['tipo'] == '1' ? 'ventanilla.queja' : 'ventanilla.denuncia';
                 }
                 this.setMarcador(coordenada_inicial)
             },
+
             setMarcador(coordenadas) {
                 var $this = this
                 let marcadorS = new google.maps.Marker({
@@ -567,25 +531,40 @@ $url = $row['tipo'] == '1' ? 'ventanilla.queja' : 'ventanilla.denuncia';
                     $this.setLatLngToCampo({lat: event.latLng.lat(), lng: event.latLng.lng()})
                 });
             },
+
             setLatLngToCampo(coordenada) {
                 var lat = coordenada.lat;
                 var lng = coordenada.lng
                 this.current_manifestacion.coordenada_lugar_hecho = lat + ',' + lng
             },
+
             showPdfInNewTab(base64Data, fileName) {
                 let pdfWindow = window.open("");
-                pdfWindow.document.write("<html<head><title>" + fileName + "</title><style>body{margin: 0px;}iframe{border-width: 0px;}</style></head>");
-                pdfWindow.document.write("<body><embed width='100%' height='100%' src='data:application/pdf;base64, " + encodeURI(base64Data) + "#toolbar=0&navpanes=0&scrollbar=0'></embed></body></html>");
+                pdfWindow.document.write("<html<head><title>"+fileName+"</title><style>body{margin: 0px;}iframe{border-width: 0px;}</style></head>");
+                pdfWindow.document.write("<body><embed width='100%' height='100%' src='data:application/pdf;base64, " + encodeURI(base64Data) + "#scrollable=0'></embed></body></html>");
             },
-            dowloadFile(base64Data, prefixName) {
+
+            dowloadFile (base64Data, prefixName) {
                 var name_file = prefixName + this.current_manifestacion.folio.replace('/', '_') + '.pdf';
                 var $a = $("<a>");
-                $a.attr("href", 'data:application/pdf;base64,' + base64Data);
+                $a.attr("href",'data:application/pdf;base64,'+ base64Data);
                 $("body").append($a);
                 $a.attr("download", name_file);
                 $a[0].click();
                 $a.remove();
-            }
+            },
+
+            isJSON(text) {
+                if (typeof text !== "string") {
+                    return false;
+                }
+                try {
+                    var json = JSON.parse(text);
+                    return (typeof json === 'object');
+                } catch (error) {
+                    return false;
+                }
+            },
         }
     }
 </script>

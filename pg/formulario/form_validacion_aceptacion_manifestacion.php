@@ -235,20 +235,22 @@
     <div class="col-md-12">
         <div class="callout callout-danger"
              x-show="prevencionPendiente && prevencionVigente">
-            <p x-show="prevencionVigente">Esta solicitud cuenta con una prevención pendiente por atender.</p>
+            <p x-show="prevencionVigente">Esta solicitud cuenta con una prevención pendiente por atender, sirvase encontrar los detalles en el acta de prevencion, situada en la parte inferior.</p>
             <p x-show="!prevencionVigente">La prevención notificada a esta solicitud se ha cerrado por plazo vencido.</p>
         </div>
     </div>
-</div>
-<div class="row" x-show="prevencionPendiente">
-    <div class="col-12">
-        <div class="callout callout-danger">
-            <label>Motivo de prevención</label>
-            <div x-html="textoPrevencion"></div>
+    <div class="col-md-12" x-show="listaActaFirmadaAdmisionSolicitud.length">
+        <label>Lista de actas disponibles para descargar</label><br>
+        <div class="btn-group">
+            <template x-for="(item, index) in listaActaFirmadaAdmisionSolicitud">
+                <a key="index" type="button" :href="path_file() + item.path_acta_firmada" class="btn btn-outline-info" target="_blank" title="Descargar acta">
+                    <span x-text="item.nombre"></span> <i class="fa fa-download"></i>
+                </a>
+            </template>
         </div>
     </div>
 </div>
-<div class="row">
+<div class="row pt-4">
     <div class="col-md-12 text-center" x-show="loading">
         <div class='text-center'><i class='fas fa-1x fa-sync fa-spin'></i></div>
     </div>
@@ -262,25 +264,5 @@
         </div>
     </div>
 </div>
-<div class="row" x-show="controlActaAceptacion">
-    <div class="col-md-12 text-center" x-show="loading_download_acta">
-        <div class='text-center'><i class='fas fa-1x fa-sync fa-spin'></i></div>
-    </div>
-    <div class="col-md-12" x-show="!loading_download_acta">
-        <div class="form-group" >
-            <div class="btn-group">
-                <button
-                        @click="descargarActaAdmision()"
-                        class="btn btn-success">
-                    Descargar acta <i class="fa fa-download"></i>
-                </button>
-                <button
-                        @click="descargarActaAdmision(1)"
-                        class="btn btn-warning">
-                    Vista previa <i class="fa fa-search-plus"></i>
-                </button>
-            </div>
-        </div>
-    </div>
-</div>
+
 
