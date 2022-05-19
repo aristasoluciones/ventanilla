@@ -117,6 +117,9 @@ class QuerysB
         $strQuery  = "SELECT a.id_solicitud_queja,a.folio, a.nombre, a.apellidos, date_format(a.fecha_queja, '%d/%m/%Y') fecha_queja,
                   a.id_etapa_queja, c.nombre as nacionalidad, d.nombre as etapa, b.nombre as lugar,e.nombre as localidad,
                   a.estatus, a.tipo, a.nombre_manifestacion, a.anonima,
+                  (SELECT tipo_respuesta_etapa 
+                    FROM tbl_solicitud_queja_seguimiento
+                    WHERE id_solicitud_queja = a.id_solicitud_queja order by id_solicitud_queja_seguimiento desc limit 1) as tipo_respuesta_etapa,  
                   IF(a.id_etapa_queja IN(8), 1, 0) finalizado
                   FROM (select sa.*, sb.tipo, sb.nombre nombre_manifestacion from tbl_solicitud_queja sa join tblc_tipo_queja sb on sa.id_tipo_queja=sb.id_tipo_queja)  a
                   LEFT JOIN tblc_municipio b ON a.id_municipio_hecho = b.id_municipio

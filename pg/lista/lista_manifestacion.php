@@ -33,14 +33,24 @@ $items = !is_array($results) ? [] :  $results;
                 <tbody>
                 <?php foreach($items as $item) {
                     switch ((int)$item->id_etapa_queja) {
-                        case 1: $bag_estatus = "<small class='badge badge-primary'>".$item->etapa."</small>"; break;
-                        case 2:$bag_estatus = "<small class='badge badge-warning'>".$item->etapa."</small>";break;
-                        case 3: $bag_estatus = "<small class='badge badge-info'>".$item->etapa."</small>"; break;
-                        case 4: $bag_estatus = "<small class='badge badge-info'>".$item->etapa."</small>"; break;
-                        case 5: $bag_estatus = "<small class='badge badge-success'>".$item->etapa."</small>"; break;
-                        case 6: $bag_estatus = "<small class='badge badge-success'>".$item->etapa."</small>"; break;
-                        case 7: $bag_estatus = "<small class='badge badge-warning'>".$item->etapa."</small>"; break;
-                        case 8: $bag_estatus = "<small class='badge badge-success'>".$item->etapa."</small>"; break;
+                        case 1: $bagEstatus = "<small class='badge badge-primary'>".$item->etapa."</small>"; break;
+                        case 2:$bagEstatus = "<small class='badge badge-warning'>".$item->etapa."</small>";break;
+                        case 3: $bagEstatus = "<small class='badge badge-info'>".$item->etapa."</small>"; break;
+                        case 4: $bagEstatus = "<small class='badge badge-info'>".$item->etapa."</small>"; break;
+                        case 5: $bagEstatus = "<small class='badge badge-info'>".$item->etapa."</small>"; break;
+                        case 6: $bagEstatus = "<small class='badge badge-warning'>".$item->etapa."</small>"; break;
+                        case 7: $bagEstatus = "<small class='badge badge-info'>".$item->etapa."</small>"; break;
+                        case 8: $bagEstatus = "<small class='badge badge-info'>".$item->etapa."</small>"; break;
+                        case 9:
+                            switch ((int) $item->tipo_respuesta_etapa) {
+                                case 1: $sufixEtapa = 'Finalizado por conciliación'; break;
+                                case 2: $sufixEtapa = 'Finalizado por improcedencia'; break;
+                                case 3: $sufixEtapa = 'Finalizado por resolucíon'; break;
+                                default: $sufixEtapa = '';
+                            }
+                            $sufixEtapa = $sufixEtapa ? "<br>(".$sufixEtapa.")" : "";
+                            $bagEstatus = "<small class='badge badge-success'>".$item->etapa.$sufixEtapa."</small>";
+                            break;
                     }
                     ?>
                     <tr>
@@ -48,7 +58,7 @@ $items = !is_array($results) ? [] :  $results;
                         <td><?= $item->folio ?></td>
                         <td><?= $item->anonima == '1' ? 'Anónima' : $item->nombre . " " . $item->apellidos; ?></td>
                         <td><?= $item->fecha_queja ?></td>
-                        <td><?= $bag_estatus ?><br>
+                        <td><?= $bagEstatus ?><br>
                         </td>
                         <td>
                             <div class="btn-group btn-group-sm">
