@@ -207,6 +207,20 @@ $url = $row['tipo'] == '1' ? 'ventanilla.queja' : 'ventanilla.denuncia';
                 let seguimiento = this.getListaSeguimientoFiltrado([1])
                 return this.pilaActaFirmada(seguimiento)
             },
+            get listaActaFirmadaCierreInstruccion () {
+                let seguimiento = this.getListaSeguimientoFiltrado([7])
+                return this.pilaActaFirmada(seguimiento)
+            },
+
+            get listaActaFirmadaResolucion () {
+                let seguimiento = this.getListaSeguimientoFiltrado([8])
+                return this.pilaActaFirmada(seguimiento)
+            },
+
+            get listaActaFirmadaConciliacion () {
+                let seguimiento = this.getListaSeguimientoFiltrado([4])
+                return this.pilaActaFirmada(seguimiento)
+            },
 
             pilaActaFirmada (seguimiento) {
                 let pila_acta = []
@@ -219,6 +233,9 @@ $url = $row['tipo'] == '1' ? 'ventanilla.queja' : 'ventanilla.denuncia';
 
                 let seguimiento_json = JSON.parse(seguimiento[0].seguimiento)
 
+                if (!seguimiento_json.hasOwnProperty('pila_acta'))
+                    return pila_acta
+
                 if (!seguimiento_json.pila_acta.length)
                     return pila_acta
 
@@ -230,10 +247,16 @@ $url = $row['tipo'] == '1' ? 'ventanilla.queja' : 'ventanilla.denuncia';
                     switch (parseInt(item.tipo)) {
                         case 1:
                             nombre = 'Acta de admisión  de pruebas'
-                            if (parseInt(seguimiento[0].id_etapa_queja) === 7)
-                                nombre = 'Acta cierre de instrucción'
-                            if (parseInt(seguimiento[0].id_etapa_queja) === 8)
-                                nombre = 'Acta de resolución'
+                            switch (parseInt(seguimiento[0].id_etapa_queja)) {
+                                case 1: nombre = 'Acta admisión de solicitud'
+                                    break;
+                                case 4: nombre = 'Acta conciliación'
+                                    break;
+                                case 7: nombre = 'Acta de cierre de instrucción'
+                                    break;
+                                case 8: nombre = 'Acta de resolución'
+                                    break;
+                            }
                             break
                         case 2: nombre = 'Acta de desechamiento de pruebas'
                             break
