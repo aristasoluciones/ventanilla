@@ -26,6 +26,7 @@ if ($_POST['id'] > 0) {
                 switch (document.location.hostname) {
                     case 'turismo.test':
                     case 'ventanilla.test':
+                    case 'turista.plataformasecturchiapas.mx':
                     case 'prestadores.plataformasecturchiapas.com':
                     case 'prestadores.plataformasecturchiapas.mx': return ''
                     default : return '/turismo'
