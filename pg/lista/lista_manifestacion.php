@@ -74,11 +74,12 @@ $items = !is_array($results) ? [] :  $results;
                                    title="Historial seguimiento">
                                     <i class="fa fa-history"></i>
                                 </a>
-                                <?php if($item->finalizado) { ?>
+                                <?php if($item->finalizado && (int)$item->tipo_respuesta_etapa === 3) { ?>
                                     <a href="javascript:;"
+                                       onclick="parent.open_modal_recurso_consideracion('<?= $item->id_solicitud_queja ?>')"
                                        class="btn btn-success"
-                                       title="Recurso de consideración">
-                                        <i class="fa fa-box"></i>
+                                       title="Recurso de reconsideración">
+                                        <i class="fa fa-archive"></i>
                                     </a>
                                 <?php } ?>
                             </div>

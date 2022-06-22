@@ -413,106 +413,40 @@ class FuncionesB
         return dirname($this->realDocRoot());
     }
 
-    function generarAcuerdoPdf($data, $type, $to = 2, $prefixFile = '') {
-        $name_meses = [
-            1 => 'Enero',
-            2 => 'Febrero',
-            3 => 'Marzo',
-            4 => 'Abril',
-            5 => 'Mayo',
-            6 => 'Junio',
-            7 => 'Julio',
-            8 => 'Agosto',
-            9 => 'Septiembre',
-            10 => 'Octubre',
-            11 => 'Noviembre',
-            12 => 'Diciembre'
-        ];
-        // create new PDF document
-        $pdf = new TCPDF(PDF_PAGE_ORIENTATION, PDF_UNIT,
-            PDF_PAGE_FORMAT, true, 'UTF-8', false);
-        $fecha_explode = explode('-', $data['fecha_seguimiento']);
-        $lugar = 'Tuxtla Gutiérrez, Chiapas a '.$fecha_explode[2].' de '.$name_meses[(int)$fecha_explode[1]].' del '.$fecha_explode[0];
+    public function validarExistenciaArchivo ($files, $tipo = 1) {
+        $filtrado = [];
 
-        // set document information
-        $pdf->setCreator(PDF_CREATOR);
-        $pdf->setAuthor('SECTUR');
-        $pdf->setTitle('Acuerdo de admisión');
-        $pdf->setSubject('Acuerdo de admisión');
-        $pdf->setKeywords('acuerdo, aceptación, validado');
+        if (!is_array($files))
+            return $filtrado;
 
-        // set default header data
-        $pdf->setHeaderData("../../dist/img/propios/sectur-min.png", 35,
-            'SECRETARÍA DE TURISMO DEL ESTADO DE CHIAPAS', 'UNIDAD DE ASUNTOS JURÍDICOS', array(102,102,102), array(0,64,128));
-        $pdf->setFooterData(array(0,64,0), array(0,64,128));
+        $pathBase = $this->mainDocRoot();
+        $pathBase = $pathBase === '/var/www/vhosts/plataformasecturchiapas.mx'
+            ? $pathBase.'/httpdocs'
+            : $pathBase;
 
-        // set header and footer fonts
-        $pdf->setHeaderFont(Array(PDF_FONT_NAME_MAIN, '', PDF_FONT_SIZE_MAIN));
-        $pdf->setFooterFont(Array(PDF_FONT_NAME_DATA, '', PDF_FONT_SIZE_DATA));
-
-        // set default monospaced font
-        $pdf->setDefaultMonospacedFont(PDF_FONT_MONOSPACED);
-
-        // set margins
-        $pdf->setMargins(PDF_MARGIN_LEFT, PDF_MARGIN_TOP, PDF_MARGIN_RIGHT);
-        $pdf->setHeaderMargin(PDF_MARGIN_HEADER);
-        $pdf->setFooterMargin(PDF_MARGIN_FOOTER);
-
-        // set auto page breaks
-        $pdf->setAutoPageBreak(TRUE, PDF_MARGIN_BOTTOM);
-
-        // set image scale factor
-        $pdf->setImageScale(PDF_IMAGE_SCALE_RATIO);
-
-        // set some language-dependent strings (optional)
-        if (@file_exists(dirname(__FILE__).'/lang/eng.php')) {
-            require_once(dirname(__FILE__).'/lang/eng.php');
-            $pdf->setLanguageArray($l);
+        $pathBase = str_replace('\\', '/', $pathBase)."/turismo";
+        if ($tipo == 1) {
+            foreach ($files as $key => $evidencia) {
+                $evidencia = !is_array($evidencia) ? [] : $evidencia;
+                foreach ($evidencia as $item) {
+                    if (is_file($pathBase.$item['path'])) {
+                        if (!isset($filtrado[$key]))
+                            $filtrado[$key] = [];
+                        array_push($filtrado[$key], $item);
+                    }
+                }
+            }
+            return $filtrado;
         }
 
-        // ---------------------------------------------------------
-
-        // set default font subsetting mode
-        $pdf->setFontSubsetting(true);
-
-        // Set font
-        // dejavusans is a UTF-8 Unicode font, if you only need to
-        // print standard ASCII chars, you can use core fonts like
-        // helvetica or times to reduce file size.
-        $pdf->setFont('', '', 12, '', true);
-
-        // Add a page
-        // This method has several options, check the source code documentation for more information.
-        $pdf->AddPage();
-
-        // set text shadow effect
-        //$pdf->setTextShadow(array('enabled'=>true, 'depth_w'=>0.2, 'depth_h'=>0.2, 'color'=>array(196,196,196), 'opacity'=>1, 'blend_mode'=>'Normal'));
-        switch($to) {
-            case 1:
-                $to = '<p style="text-align: left"><strong>C. '.$data['nombre'].'</strong></p>';
-                $pdf->writeHTMLCell(0, 0, '', '', '<p style="text-align: right">'.$lugar.'</p><br>', 0, 1, 0, true, '', true);
-                $pdf->writeHTMLCell(0, 0, '', '', $to, 0, 1, 0, true, '', true);
-                break;
-            case 2:
-                $to = '<p style="text-align: left"><strong>C. '.$data['nombre_representante'].'</strong></p>';
-                $cargoTo = "<p style='text-align: left'>Representante de ".$data['nombre_establecimiento']."</p><br>";
-                $pdf->writeHTMLCell(0, 0, '', '', '<p style="text-align: right">'.$lugar.'</p><br>', 0, 1, 0, true, '', true);
-                $pdf->writeHTMLCell(0, 0, '', '', $to, 0, 1, 0, true, '', true);
-                $pdf->writeHTMLCell(0, 0, '', '', $cargoTo, 0, 1, 0, true, '', true);
-                break;
+        foreach ($files as $key => $evidencia) {
+            if (is_file($pathBase.$evidencia['path'])) {
+                if (!is_array($filtrado))
+                    $filtrado = [];
+                array_push($filtrado, $evidencia);
+            }
         }
-        $pdf->writeHTMLCell(0, 0, '', '', '<p STYLE="text-align: center">PRESENTE</p>', 0, 1, 0, true, '', true);
-        $pdf->writeHTMLCell(0, 0, '', '', $data['texto_pdf'], 0, 1, 0, true, '', true);
-        $pdf->writeHTMLCell(0, 0, '', '', '<br><br>', 0, 1, 0, true, '', true);
-        $pdf->writeHTMLCell(0, 0, '', '', '<p style="text-align: center; font-weight: bold">ATENTAMENTE</p><br>', 0, 1, 0, true, '', true);
-        $pdf->writeHTMLCell(0, 0, '', '', '<p style="text-align: center">Secretaría de turismo del estado de chiapas.</p>', 0, 1, 0, true, '', true);
-        // ---------------------------------------------------------
-
-        // Close and output PDF document
-        // This method has several options, check the source code documentation for more information.
-        $nombre_archivo =  str_replace('/', '', $data['folio']);
-        $nombre_archivo = $prefixFile."_".$nombre_archivo;
-        return $pdf->Output($nombre_archivo.'.pdf', $type);
+        return $filtrado;
     }
 
 }

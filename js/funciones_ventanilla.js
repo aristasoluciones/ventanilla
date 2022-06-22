@@ -165,6 +165,31 @@ function list_modal_historia_seguimiento(id=0){
     })
 }
 
+/*
+    recurso de consideracion
+ */
+function open_modal_recurso_consideracion(id=0){
+    if(id === 0)
+        $('#modal-default').modal('hide')
+
+    url    = web_root + '/pg/modal_recurso_consideracion.php'
+    $('div.modal-dialog').css({'max-width':'70%'})
+    params = {'id':id}
+    $.ajax({
+        beforeSend: function() {
+            $("#modalContent").trigger('create')
+            $('#modal-default').modal('show')
+            $("#modalContent").html(overlay)
+        },
+        type:    "post",
+        url:     url,
+        data:    params,
+        success: function(data){
+            $("#modalContent").html(data)
+        }
+    })
+}
+
 // eventos
 $(document).on('click', '#btn-logout', logout);
 $(document).on('click', '#btn-guardar-seguimiento', guardar_seguimiento);

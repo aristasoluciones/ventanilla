@@ -108,6 +108,17 @@ switch($_POST['opcion']) {
             $jsondata['file'] = base64_encode($dato);
         }
         break;
+    case 8:
+        $id = $funcionesB->limpia($_POST['id']);
+        $row = $conexion->fetch_objet($querys->getRecursoRecosinderacion($id));
+        if($row) {
+            $evidencias = json_decode($row->evidencia, true);
+            $row->evidencia =  json_encode($funcionesB->validarExistenciaArchivo($evidencias, 0));
+            $archivos = json_decode($row->archivo, true);
+            $row->archivo =  json_encode($funcionesB->validarExistenciaArchivo($archivos, 0));
+        }
+        $jsondata['data'] =  $row;
+        break;
     }
     echo json_encode($jsondata);
 ?>

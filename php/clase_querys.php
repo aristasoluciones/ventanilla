@@ -120,7 +120,7 @@ class QuerysB
                   (SELECT tipo_respuesta_etapa 
                     FROM tbl_solicitud_queja_seguimiento
                     WHERE id_solicitud_queja = a.id_solicitud_queja order by id_solicitud_queja_seguimiento desc limit 1) as tipo_respuesta_etapa,  
-                  IF(a.id_etapa_queja IN(8), 1, 0) finalizado
+                  IF(a.id_etapa_queja IN(9, 17), 1, 0) finalizado
                   FROM (select sa.*, sb.tipo, sb.nombre nombre_manifestacion from tbl_solicitud_queja sa join tblc_tipo_queja sb on sa.id_tipo_queja=sb.id_tipo_queja)  a
                   LEFT JOIN tblc_municipio b ON a.id_municipio_hecho = b.id_municipio
                   LEFT JOIN tblc_localidad_delegacion e ON a.id_localidad_hecho = e.id_localidad_delegacion
@@ -133,11 +133,11 @@ class QuerysB
         return $strQuery;
     }
 
-    /*
+    /**
      * @param int $id
-     * return String $strQuery
+     * return string
      */
-    public function getSolicitud($id) {
+    public function getSolicitud($id) : string {
         $strQuery  = "SELECT 
                   a.id_solicitud_queja,
                   a.nombre,
@@ -216,6 +216,17 @@ class QuerysB
                   LEFT JOIN tblc_pais g ON a.id_pais = g.id_pais
                   WHERE a.id_solicitud_queja = '". $id."' AND a.id_turista='".$_SESSION['vUsuario']['id_turista']."'";
         return $strQuery;
+    }
+
+    /**
+     * @param $id
+     * @return string
+     */
+    public function getRecursoRecosinderacion($id) : string {
+        $sql = "SELECT * FROM tbl_solicitud_queja_recurso 
+                WHERE id_solicitud_queja= '" . $id . "' 
+                AND ISNULL(fecha_eliminado) AND origen = 2 LIMIT 1";
+        return $sql;
     }
 }
 
