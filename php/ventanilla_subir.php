@@ -120,5 +120,90 @@
             }
             echo json_encode($jsondata);
         break;
+        case 3:
+            $idSolicitud =  $_POST['id_solicitud'] ?? 0;
+            // se trunca el proceso si no trae un id_solicitud;
+            if($idSolicitud <= 0 ) {
+                $jsondata['resp'] =  0;
+                echo json_encode($jsondata);
+                exit;
+            }
+            $id =  $_POST['id'] ?? 0 ;
+            $actas = [];
+            $evidencias = [];
+            $pathBase = $funciones->mainDocRoot().'/turismo';
+            $carpetaDestino = 'archivos/ventanilla/recurso_reconsideracion/'.$idSolicitud."/turista";
+            $dirDestino = $pathBase . "/" . $carpetaDestino;
+            if (!is_dir($dirDestino))
+                mkdir($dirDestino, 0775, true);
+
+            // obtenemos archivos y evidencias existentes
+            if ($id > 0) {
+                $sql = "SELECT archivo, evidencia from tbl_solicitud_queja_recurso
+                        WHERE id_solicitud_queja_recurso='".$id."'";
+                $existe     = $conexion->fetch_objet($sql);
+                $actas   = $existe ? json_decode($existe->archivo, true) : [];
+                $actas   = !is_array($actas) ? [] : $actas;
+                $evidencias   = $existe ? json_decode($existe->evidencia, true) : [];
+                $evidencias   = !is_array($evidencias) ? [] : $evidencias;
+            }
+
+            foreach($_FILES as $key => $var) {
+                foreach($var['name'] as $indice => $fileName) {
+                    if ($var['error'][$indice] === UPLOAD_ERR_OK) {
+                        $extensionNombre = explode('.', $fileName);
+                        $extension = end($extensionNombre);
+                        $idArchivo = uniqid();
+                        $path = "/".$carpetaDestino."/".$key."_".$idArchivo.'.'.$extension;
+
+                        if (move_uploaded_file($var['tmp_name'][$indice], $pathBase.$path)) {
+                            $cad['id'] = $idArchivo;
+                            $cad['title'] = $fileName;
+                            $cad['path'] = $path;
+                            $cad['tipo'] = $key;
+                            switch($key) {
+                                case 'acta': array_push($actas, $cad); break;
+                                case 'evidencia': array_push($evidencias, $cad); break;
+                                default: unlink($pathBase.$path); break;
+                            }
+                        }
+                    }
+                }
+            }
+
+            $archivosJson = json_encode($actas);
+            $evidenciaJson =  json_encode($evidencias);
+
+            $strQuery  ="call sp_ventanillaGuardarRecursoReconsideracion(";
+            $strQuery .=$id;
+            $strQuery .=",".$idSolicitud;
+            $strQuery .=",'".$archivosJson."'";
+            $strQuery .=", '".$evidenciaJson."'";
+            $strQuery .=",2";
+            $strQuery .=",'".date('Y-m-d')."'";
+            $strQuery .=",@idOut)";
+
+            if ((count($actas) + count($evidencias)) <= 0) {
+                $jsondata['resp'] = 0;
+                $jsondata['msg'] = 'Error, intente nuevamente';
+            } else {
+                if ($conexion->consulta($strQuery) == 0) {
+                    $jsondata['resp'] = 0;
+                } else {
+                    $jsondata['resp'] = 1;
+                    $sql = "SELECT * FROM tbl_solicitud_queja_recurso
+                    WHERE id_solicitud_queja_recurso= @idOut ";
+                    $row = $conexion->fetch_objet($sql);
+                    if ($row) {
+                        $evidencias = json_decode($row->evidencia, true);
+                        $row->evidencia =  json_encode($funciones->validarExistenciaArchivo($evidencias, 0));
+                        $archivos = json_decode($row->archivo, true);
+                        $row->archivo =  json_encode($funciones->validarExistenciaArchivo($archivos, 0));
+                    }
+                    $jsondata['data'] = $row;
+                }
+            }
+            echo json_encode($jsondata);
+            break;
     }
 ?>
