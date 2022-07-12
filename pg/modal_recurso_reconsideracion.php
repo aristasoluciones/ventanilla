@@ -3,8 +3,17 @@ require_once("../php/inicializandoDatosExterno.php");
 $row = [];
 if ($_POST['id'] > 0) {
     $id = $funciones->limpia($_POST['id']);
-    $row = $conexion->fetch_array($querys->getSolicitud($id));
 }
+$configs = $conexion->obtenerlista($querys->getConfiguracionWeb(4));
+$configs = !is_array($configs) ? [] : $configs;
+$config = [];
+foreach($configs as $conf) {
+    $conf->valor =  strip_tags($conf->valor);
+    $config[$conf->campo] = $conf;
+}
+$path_instruccion = isset($config['instruccion_pprr'])
+    ? $funciones->webRootFile().$config['instruccion_pprr']->archivo
+    : '';
 ?>
 <div class="modal-header">
     <h4 class="modal-title">Presentar Recurso de Reconsideración</b></h4>
@@ -42,6 +51,10 @@ if ($_POST['id'] > 0) {
                     default : return '/turismo'
                 }
             },
+            current_recurso: {
+                etapa_actual_completo: { class:null, nombre: null},
+                pila_seguimiento: [],
+            },
             id_solicitud: null,
             id_solicitud_recurso: null,
             dropzones_recurso: [],
@@ -50,6 +63,15 @@ if ($_POST['id'] > 0) {
             archivos: [],
             evidencias: [],
 
+            inicializarRecurso (data) {
+                this.current_recurso    = Object.assign( this.current_recurso, { ...data });
+                this.pila_seguimiento   = this.helper_ventanilla.isJSON(this.current_recurso.seguimiento)
+                    ? JSON.parse(this.current_recurso.seguimiento) : [];
+
+                let current_etapa = this.pila_seguimiento.find((el) => parseInt(el.id) === parseInt(this.current_recurso.etapa));
+                if (current_etapa !== null)
+                    this.current_recurso.etapa_actual_completo = { ...current_etapa };
+            },
             async iniciar (id) {
                 this.id_solicitud = id;
                 // es un solo RR que se puede presentar.
@@ -104,7 +126,6 @@ if ($_POST['id'] > 0) {
                     });
                     this.dropzones_recurso.push(myDropzone);
                 })
-
             },
 
             async enviarRecurso () {

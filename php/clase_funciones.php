@@ -7,6 +7,18 @@ class FuncionesB
 {
     var $conexion = 0;
 
+    public function webRootFile() {
+        switch ($_SERVER['HTTP_HOST']) {
+            case 'ventanilla.test':
+            case 'prestadores.test': $httpHost = 'http://turismo.test'; break;
+            case 'turista.plataformasecturchiapas.mx':
+            case 'prestadores.plataformasecturchiapas.com':
+            case 'prestadores.plataformasecturchiapas.mx': $httpHost = 'https://plataformasecturchiapas.mx/turismo'; break;
+            default :  $httpHost = ''; break;
+        }
+        return $httpHost;
+    }
+
     public function webRoot()
     {
         $http_host = $_SERVER['HTTP_HOST'];
