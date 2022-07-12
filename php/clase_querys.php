@@ -116,10 +116,14 @@ class QuerysB
 
         $strQuery  = "SELECT a.id_solicitud_queja,a.folio, a.nombre, a.apellidos, date_format(a.fecha_queja, '%d/%m/%Y') fecha_queja,
                   a.id_etapa_queja, c.nombre as nacionalidad, d.nombre as etapa, b.nombre as lugar,e.nombre as localidad,
-                  a.estatus, a.tipo, a.nombre_manifestacion, a.anonima,
+                  a.estatus, a.tipo, a.nombre_manifestacion, a.anonima, date_format(a.fecha_registro, '%d/%m/%Y %H:%i:%s') fecha_registro,
                   (SELECT tipo_respuesta_etapa 
                     FROM tbl_solicitud_queja_seguimiento
                     WHERE id_solicitud_queja = a.id_solicitud_queja order by id_solicitud_queja_seguimiento desc limit 1) as tipo_respuesta_etapa,  
+                  (SELECT fn_calcularVigenciaVentanilla(2, null, ssa.fecha_registro) 
+                       FROM tbl_solicitud_queja_seguimiento ssa
+                       WHERE ssa.id_solicitud_queja = a.id_solicitud_queja order by ssa.id_solicitud_queja_seguimiento desc limit 1) as fecha_vencimiento_etapa, 
+                      (SELECT count(*) FROM tbl_solicitud_queja_recurso sr WHERE sr.id_solicitud_queja=a.id_solicitud_queja) existe_recurso,
                   IF(a.id_etapa_queja IN(9, 17), 1, 0) finalizado
                   FROM (select sa.*, sb.tipo, sb.nombre nombre_manifestacion from tbl_solicitud_queja sa join tblc_tipo_queja sb on sa.id_tipo_queja=sb.id_tipo_queja)  a
                   LEFT JOIN tblc_municipio b ON a.id_municipio_hecho = b.id_municipio
@@ -227,6 +231,17 @@ class QuerysB
                 WHERE id_solicitud_queja= '" . $id . "' 
                 AND ISNULL(fecha_eliminado) AND origen = 2 LIMIT 1";
         return $sql;
+    }
+
+    /**
+     * @param $idModulo
+     * @return string
+     */
+    public function getConfiguracionWeb($idModulo)
+    {
+        $strQuery = "SELECT id_modulo, id_configuracion, campo, valor, campo_mostrar, archivo FROM tbl_configuracion
+                  WHERE id_modulo = '" . $idModulo . "' ";
+        return $strQuery;
     }
 }
 

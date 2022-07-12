@@ -22,16 +22,18 @@ $items = !is_array($results) ? [] :  $results;
             <table class="table table-bordered">
                 <thead>
                 <tr>
-                    <th>Tipo de solicitud</th>
+                    <th>Tipo</th>
+                    <th>Fecha</th>
                     <th>Folio</th>
                     <th>Nombre</th>
-                    <th>Fecha</th>
+                    <th>Fecha de los hechos</th>
                     <th>Estatus</th>
                     <th>Acciones</th>
                 </tr>
                 </thead>
                 <tbody>
                 <?php foreach($items as $item) {
+                    $bagRecurso = "";
                     switch ((int)$item->id_etapa_queja) {
                         case 1: $bagEstatus = "<small class='badge badge-primary'>".$item->etapa."</small>"; break;
                         case 2:$bagEstatus = "<small class='badge badge-warning'>".$item->etapa."</small>";break;
@@ -50,15 +52,27 @@ $items = !is_array($results) ? [] :  $results;
                             }
                             $sufixEtapa = $sufixEtapa ? "<br>(".$sufixEtapa.")" : "";
                             $bagEstatus = "<small class='badge badge-success'>".$item->etapa.$sufixEtapa."</small>";
+                            if (($item->finalizado && (int)$item->tipo_respuesta_etapa === 3) || $item->existe_recurso) {
+                                if (date('Y-m-d') <= $item->fecha_vencimiento_etapa) {
+                                    $bagRecurso = "<a href='javascript:;' title='Presentar recurso de reconsideración' onclick='parent.open_modal_recurso_reconsideracion(" . $item->id_solicitud_queja . ")'>";
+                                    $bagRecurso .= $item->existe_recurso
+                                        ? "<small class='badge badge-primary'>Recurso de reconsideración existente</small>"
+                                        : "<small class='badge badge-warning'>Haga click , para presentar recurso de reconsideración</small>";
+                                    $bagRecurso .= "</a>";
+                                } else {
+                                    $bagRecurso = "<small class='badge badge-secondary'>Plazo vencido para recurso de reconsideración</small>";
+                                }
+                            }
                             break;
                     }
                     ?>
                     <tr>
                         <td><?= $item->nombre_manifestacion ?></td>
+                        <td><?= $item->fecha_registro ?></td>
                         <td><?= $item->folio ?></td>
                         <td><?= $item->anonima == '1' ? 'Anónima' : $item->nombre . " " . $item->apellidos; ?></td>
                         <td><?= $item->fecha_queja ?></td>
-                        <td><?= $bagEstatus ?><br>
+                        <td><?= $bagEstatus ?><br><?= $bagRecurso ?>
                         </td>
                         <td>
                             <div class="btn-group btn-group-sm">
@@ -74,14 +88,6 @@ $items = !is_array($results) ? [] :  $results;
                                    title="Historial seguimiento">
                                     <i class="fa fa-history"></i>
                                 </a>
-                                <?php if($item->finalizado && (int)$item->tipo_respuesta_etapa === 3) { ?>
-                                    <a href="javascript:;"
-                                       onclick="parent.open_modal_recurso_consideracion('<?= $item->id_solicitud_queja ?>')"
-                                       class="btn btn-success"
-                                       title="Recurso de reconsideración">
-                                        <i class="fa fa-archive"></i>
-                                    </a>
-                                <?php } ?>
                             </div>
                         </td>
                     </tr>

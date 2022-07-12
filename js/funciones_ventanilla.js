@@ -168,11 +168,11 @@ function list_modal_historia_seguimiento(id=0){
 /*
     recurso de consideracion
  */
-function open_modal_recurso_consideracion(id=0){
+function open_modal_recurso_reconsideracion(id=0){
     if(id === 0)
         $('#modal-default').modal('hide')
 
-    url    = web_root + '/pg/modal_recurso_consideracion.php'
+    url    = web_root + '/pg/modal_recurso_reconsideracion.php'
     $('div.modal-dialog').css({'max-width':'70%'})
     params = {'id':id}
     $.ajax({

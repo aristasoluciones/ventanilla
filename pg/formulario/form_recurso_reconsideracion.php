@@ -1,16 +1,25 @@
 <!-- vista previa dropzone -->
 <div x-data="componenteRecursoRec()" id="zone-file-recurso" x-init="iniciar(<?= $id ?>)">
-    <div class="row">
+    <div class="row" x-show="!(id_solicitud > 0)">
         <div class="callout callout-info">
-            <strong>Nota</strong>
-            <p>Para presentar recurso de reconsideración es necesario adjuntar el acta y opcionalmente las evidencias si lo considera necesario.</p>
+            <p>
+                <?= nl2br($config['instruccion_pprr']->valor) ?>
+            </p>
+            <?php if ($path_instruccion) { ?>
+                <a type="button" class="btn btn-success"
+                   target="_blank"
+                   title="Descargar guía"
+                   href="<?= $path_instruccion ?>">
+                    Descargar guía <i class="fa fa-download"></i>
+                </a>
+            <?php } ?>
         </div>
     </div>
     <form name="frm-configuracion" id="frm-configuracion" enctype="multipart/form-data" onsubmit="return false">
         <div class="form-row">
             <div class="col-md-4 dropzone-recurso" id="acta">
                 <div class="form-group">
-                    <label>Adjuntar acta</label>
+                    <label>Adjuntar escrito</label>
                     <div class="btn-group w-100">
                       <span class="btn btn-success col fileinput-button">
                         <i class="fas fa-file-upload"></i>
@@ -45,7 +54,7 @@
             <div class="col-md-8">
                 <table class="table table-sm table-striped">
                     <thead>
-                        <th colspan="2">Actas presentadas</th>
+                        <th colspan="2">Escrito presentado</th>
                     </thead>
                     <tbody>
                         <template x-for="(archivo, index) in archivos">
