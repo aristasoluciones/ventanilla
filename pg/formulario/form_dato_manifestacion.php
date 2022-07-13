@@ -64,7 +64,7 @@
                            x-model="current_manifestacion.descripcion_hecho"></textarea>
             </div>
         </div>
-        <div class="col-md-4">
+        <div class="col-md-4" x-show="parseInt(current_manifestacion.tipo) === 1">
             <div class="form-group">
                 <label for="nombre"><span class="text-danger"></span>Propuesta de solución</label>
                 <textarea   :readonly="!prevencionPendiente || !prevencionVigente"
@@ -75,20 +75,6 @@
         <div class="col-md-12">
             <label for=""><em class="text-danger"></em>Georreferencia</label>
             <div id="georeferencia" style="height: 400px"></div>
-        </div>
-    </div>
-    <div class="row">
-        <div class="col-md-12 text-center" x-show="loading">
-            <div class='text-center'><i class='fas fa-1x fa-sync fa-spin'></i></div>
-        </div>
-        <div class="col-md-12">
-            <div class="btn-group">
-                <button @click="actualizarEnviar"
-                        x-show="prevencionPendiente && prevencionVigente"
-                        class="btn btn-success">
-                    Guardar cambios y enviar <i class="fa fa-save"></i>
-                </button>
-            </div>
         </div>
     </div>
 </form>

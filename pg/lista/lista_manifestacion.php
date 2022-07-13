@@ -36,14 +36,29 @@ $items = !is_array($results) ? [] :  $results;
                     $bagRecurso = "";
                     switch ((int)$item->id_etapa_queja) {
                         case 1: $bagEstatus = "<small class='badge badge-primary'>".$item->etapa."</small>"; break;
-                        case 2:$bagEstatus = "<small class='badge badge-warning'>".$item->etapa."</small>";break;
+                        case 2:
+                        case 6:
+                        case 11:
+                        case 14:
+                                $seguimientoCorriente =  json_decode($item->seguimiento_corriente, true);
+                                $bagEstatus = "<small class='badge badge-warning'>".$item->etapa."</small>";
+                                if ((int)$seguimientoCorriente['subsanado'] === 1) {
+                                    $bagEstatus = "<small class='badge badge-primary'>".$item->etapa." (Resuelto)</small>";
+                                }
+                                break;
                         case 3: $bagEstatus = "<small class='badge badge-info'>".$item->etapa."</small>"; break;
                         case 4: $bagEstatus = "<small class='badge badge-info'>".$item->etapa."</small>"; break;
                         case 5: $bagEstatus = "<small class='badge badge-info'>".$item->etapa."</small>"; break;
-                        case 6: $bagEstatus = "<small class='badge badge-warning'>".$item->etapa."</small>"; break;
                         case 7: $bagEstatus = "<small class='badge badge-info'>".$item->etapa."</small>"; break;
                         case 8: $bagEstatus = "<small class='badge badge-info'>".$item->etapa."</small>"; break;
+
+                        case 10: $bagEstatus = "<small class='badge badge-primary'>".$item->etapa."</small>"; break;
+                        case 12: $bagEstatus = "<small class='badge badge-info'>".$item->etapa."</small>"; break;
+                        case 13: $bagEstatus = "<small class='badge badge-info'>".$item->etapa."</small>"; break;
+                        case 15: $bagEstatus = "<small class='badge badge-info'>".$item->etapa."</small>"; break;
+                        case 16: $bagEstatus = "<small class='badge badge-info'>".$item->etapa."</small>"; break;
                         case 9:
+                        case 17:
                             switch ((int) $item->tipo_respuesta_etapa) {
                                 case 1: $sufixEtapa = 'Finalizado por conciliación'; break;
                                 case 2: $sufixEtapa = 'Finalizado por improcedencia'; break;

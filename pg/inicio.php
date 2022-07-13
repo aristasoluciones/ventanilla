@@ -12,7 +12,7 @@ $total_quejas =  $quejas['total'];
     <div class="container">
         <div class="row mb-2">
             <div class="col-sm-6">
-                <h5>Bienvenido <?= $vUsuario['nombre'] ?> </h5>
+                <h5>Bienvenido <?= $vUsuario['nombre']. " ". $vUsuario['apellidos'] ?> </h5>
             </div>
         </div>
     </div>
