@@ -119,11 +119,14 @@ class QuerysB
                   a.estatus, a.tipo, a.nombre_manifestacion, a.anonima, date_format(a.fecha_registro, '%d/%m/%Y %H:%i:%s') fecha_registro,
                   (SELECT tipo_respuesta_etapa 
                     FROM tbl_solicitud_queja_seguimiento
-                    WHERE id_solicitud_queja = a.id_solicitud_queja order by id_solicitud_queja_seguimiento desc limit 1) as tipo_respuesta_etapa,  
+                    WHERE id_solicitud_queja = a.id_solicitud_queja order by id_solicitud_queja_seguimiento desc limit 1) as tipo_respuesta_etapa,
+                  (SELECT JSON_OBJECT('subsanado', ssc.subsanado, 'fecha', ssc.fecha, 'seguimiento', ssc.seguimiento) 
+                    FROM tbl_solicitud_queja_seguimiento ssc
+                    WHERE ssc.id_solicitud_queja = a.id_solicitud_queja order by ssc.id_solicitud_queja_seguimiento desc limit 1) as seguimiento_corriente,    
                   (SELECT fn_calcularVigenciaVentanilla(2, null, ssa.fecha_registro) 
                        FROM tbl_solicitud_queja_seguimiento ssa
                        WHERE ssa.id_solicitud_queja = a.id_solicitud_queja order by ssa.id_solicitud_queja_seguimiento desc limit 1) as fecha_vencimiento_etapa, 
-                      (SELECT count(*) FROM tbl_solicitud_queja_recurso sr WHERE sr.id_solicitud_queja=a.id_solicitud_queja AND sr.origen = 2) existe_recurso,
+                  (SELECT count(*) FROM tbl_solicitud_queja_recurso sr WHERE sr.id_solicitud_queja=a.id_solicitud_queja AND sr.origen = 2) existe_recurso,
                   IF(a.id_etapa_queja IN(9, 17), 1, 0) finalizado
                   FROM (select sa.*, sb.tipo, sb.nombre nombre_manifestacion from tbl_solicitud_queja sa join tblc_tipo_queja sb on sa.id_tipo_queja=sb.id_tipo_queja)  a
                   LEFT JOIN tblc_municipio b ON a.id_municipio_hecho = b.id_municipio

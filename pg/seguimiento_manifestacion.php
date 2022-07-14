@@ -20,12 +20,13 @@ if ($row) {
 }
 $url = $row['tipo'] == '1' ? 'ventanilla.queja' : 'ventanilla.denuncia';
 ?>
+<div x-data="ComponenteSeguimiento()" x-init="await inicializar(<?= $id ?>)">
 <!-- Content Header (Page header) -->
 <div class="content-header">
     <div class="container-fluid">
         <div class="row mb-2">
             <div class="col-sm-6">
-                <a href="<?= $url ?>" title="Regresar a bandeja" class="btn btn-outline-info">Regresar</a>
+                <a :href="urlBack" title="Regresar" class="btn btn-outline-info">Regresar</a>
                 <h1 class="m-0">Seguimiento</h1>
             </div><!-- /.col -->
             <div class="col-sm-6">
@@ -40,10 +41,20 @@ $url = $row['tipo'] == '1' ? 'ventanilla.queja' : 'ventanilla.denuncia';
 <!-- /.content-header -->
 <!-- Main content -->
 <section class="content">
+    <?php if ($row) { ?>
     <div class="container-fluid">
         <div class="row">
-            <?php if ($row) { ?>
-                <div class="col-md-12" x-data="ComponenteSeguimiento()" x-init="await inicializar(<?= $id ?>)">
+            <div class="col-md-12">
+                <div class="callout callout-danger"
+                     x-show="prevencionPendiente && prevencionVigente">
+                    <p x-show="prevencionVigente"><strong>Nota: </strong>Esta solicitud cuenta con una prevención pendiente por atender, sirvase encontrar los detalles en el auto de prevencion;
+                        Una vez resuelto las observaciones, haga click en la casilla <strong>Resolver prevención</strong>  y guarde los cambios.</p>
+                    <p x-show="!prevencionVigente"><strong>Nota: </strong>La prevención notificada a esta solicitud se ha cerrado por plazo vencido.</p>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+                <div class="col-md-12">
                     <div class="card card-success">
                         <div class="card-header width-border">
                             <h3 class="card-title">Seguimiento de solicitud</h3>
@@ -141,14 +152,17 @@ $url = $row['tipo'] == '1' ? 'ventanilla.queja' : 'ventanilla.denuncia';
                         </div>
                     </div>
                 </div>
-            <?php } else { ?>
-                <div class="col-md-12">
-                    <p class="text-danger">Registro no encontrado.</p>
-                </div>
-            <?php } ?>
         </div>
     </div>
+    <?php } else { ?>
+    <div class="container">
+        <div class="col-md-12">
+            <p class="text-danger">Registro no encontrado.</p>
+        </div>
+    </div>
+    <?php } ?>
 </section>
+</div>
 <!-- /.content -->
 <script>
     function ComponenteSeguimiento() {
@@ -166,6 +180,7 @@ $url = $row['tipo'] == '1' ? 'ventanilla.queja' : 'ventanilla.denuncia';
                 }
             },
             div_mapa: null,
+            resolver_prevencion: null,
             lista_pais: [],
             lista_municipio_hecho: [],
             lista_localidad_hecho: [],
@@ -180,12 +195,24 @@ $url = $row['tipo'] == '1' ? 'ventanilla.queja' : 'ventanilla.denuncia';
             loading_download_acta: false,
             evidencia: [],
             dropzones: [],
+
+            get urlBack () {
+                if (parseInt(this.current_manifestacion.tipo) === 1)
+                    return parseInt(this.current_manifestacion.finalizado) === 1
+                        ? 'queja' : 'queja';
+
+                if (parseInt(this.current_manifestacion.tipo) === 2)
+                    return parseInt(this.current_manifestacion.finalizado) === 1
+                        ? 'denuncia' : 'denuncia';
+
+            },
+
             get enPrevencion() {
-                return [2].includes(parseInt(this.current_manifestacion.id_etapa_queja))
+                return [2, 11].includes(parseInt(this.current_manifestacion.id_etapa_queja))
             },
             get prevencionPendiente() {
                 var flag = false
-                if ([2].includes(parseInt(this.current_manifestacion.id_etapa_queja))) {
+                if ([2, 11].includes(parseInt(this.current_manifestacion.id_etapa_queja))) {
                     var seguimiento_corriente = JSON.parse(this.current_manifestacion.seguimiento_corriente)
                     var subsanado = parseInt(seguimiento_corriente.subsanado)
                     flag = subsanado !== 1
@@ -194,7 +221,7 @@ $url = $row['tipo'] == '1' ? 'ventanilla.queja' : 'ventanilla.denuncia';
             },
             get prevencionVigente() {
                 var flag = false
-                if ([2].includes(parseInt(this.current_manifestacion.id_etapa_queja))) {
+                if ([2, 11].includes(parseInt(this.current_manifestacion.id_etapa_queja))) {
                     var seguimiento_corriente = JSON.parse(this.current_manifestacion.seguimiento_corriente)
                     var fecha_corriente = moment().format('YYYY-MM-DD')
                     var fecha_vencimiento = moment(seguimiento_corriente.fecha).add(3, 'days').format('YYYY-MM-DD')
@@ -204,7 +231,7 @@ $url = $row['tipo'] == '1' ? 'ventanilla.queja' : 'ventanilla.denuncia';
             },
 
             get listaActaFirmadaAdmisionSolicitud () {
-                let seguimiento = this.getListaSeguimientoFiltrado([1])
+                let seguimiento = this.getListaSeguimientoFiltrado([1, 10])
                 return this.pilaActaFirmada(seguimiento)
             },
             get listaActaFirmadaCierreInstruccion () {
@@ -243,24 +270,33 @@ $url = $row['tipo'] == '1' ? 'ventanilla.queja' : 'ventanilla.denuncia';
                 pila_acta =  lista_acta.filter( (item) => (typeof item.path_acta_firmada !== 'undefined'))
 
                 pila_acta.forEach((item) => {
-                    let nombre = "Acta"
+                    let nombre = "Auto"
                     switch (parseInt(item.tipo)) {
                         case 1:
-                            nombre = 'Acta de admisión  de pruebas'
+                            nombre = 'Auto de admisión  de pruebas'
                             switch (parseInt(seguimiento[0].id_etapa_queja)) {
-                                case 1: nombre = 'Acta admisión de solicitud'
+                                case 1:
+                                case 10:
+                                    nombre = 'Auto de admisión de solicitud'
                                     break;
-                                case 4: nombre = 'Acta conciliación'
+                                case 4: nombre = 'Auto de conciliación'
                                     break;
-                                case 7: nombre = 'Acta de cierre de instrucción'
+                                case 7:
+                                case 15:
+                                    nombre = 'Auto de cierre de instrucción'
                                     break;
-                                case 8: nombre = 'Acta de resolución'
+                                case 8:
+                                case 16:
+                                    nombre = 'Auto de resolución'
                                     break;
                             }
                             break
-                        case 2: nombre = 'Acta de desechamiento de pruebas'
+                        case 2: nombre = 'Auto de desechamiento de pruebas'
+                            if (parseInt(seguimiento[0].id_etapa_queja) === 1 && parseInt(seguimiento[0].id_etapa_queja) === 10)
+                                nombre = 'Auto de desechamiento de solicitud'
                             break
-                        case 3: nombre = 'Acta de prevención'
+                            break
+                        case 3: nombre = 'Auto de prevención'
                             break
                     }
                     item.nombre = nombre
@@ -285,7 +321,7 @@ $url = $row['tipo'] == '1' ? 'ventanilla.queja' : 'ventanilla.denuncia';
             },
 
             async inicializar(param) {
-
+                Dropzone.autoDiscover = false;
                 $(this.$refs.select_localidad_hecho).on('change.select2', (event) => {
                     this.current_manifestacion.id_localidad_hecho = parseInt(event.target.value)
                 })
@@ -385,6 +421,12 @@ $url = $row['tipo'] == '1' ? 'ventanilla.queja' : 'ventanilla.denuncia';
                         })
                         this.dropzones.push(dropzoneItem)
                     })
+                }
+                if ([2, 11].includes(parseInt(this.current_manifestacion.id_etapa_queja))) {
+                    $("#dato_general_1").removeClass('active');
+                    $("#dato_denuncia_3").addClass('active');
+                    $("#dtab_1").removeClass('show active');
+                    $("#dtab_3").addClass('show active');
                 }
             },
             async loadCatalogo(opcion) {
@@ -491,7 +533,7 @@ $url = $row['tipo'] == '1' ? 'ventanilla.queja' : 'ventanilla.denuncia';
                 const response = await peticion.json()
                 this.loading = false
                 if (response.resp === 1) {
-                    mostrar_mensaje('Exito', 'Se han actualizado correctamente la información', 'success')
+                    mostrar_mensaje('Exito', 'Se ha actualizado correctamente la información', 'success')
                     this.current_manifestacion = {
                         ...response.data,
                     }
@@ -503,6 +545,7 @@ $url = $row['tipo'] == '1' ? 'ventanilla.queja' : 'ventanilla.denuncia';
                     $(this.$refs.select_establecimiento).val(response.data.id_establecimiento_hecho).trigger('change.select2')
                 }
             },
+
             removeFile(file) {
                 $.ajax({
                     url: url_eliminar,

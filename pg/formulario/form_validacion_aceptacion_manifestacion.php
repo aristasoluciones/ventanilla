@@ -232,15 +232,10 @@
     </div>
 </div>
 <div class="row">
-    <div class="col-md-12">
-        <div class="callout callout-danger"
-             x-show="prevencionPendiente && prevencionVigente">
-            <p x-show="prevencionVigente">Esta solicitud cuenta con una prevención pendiente por atender, sirvase encontrar los detalles en el acta de prevencion, situada en la parte inferior.</p>
-            <p x-show="!prevencionVigente">La prevención notificada a esta solicitud se ha cerrado por plazo vencido.</p>
-        </div>
-    </div>
-    <div class="col-md-12" x-show="listaActaFirmadaAdmisionSolicitud.length">
-        <label>Lista de actas disponibles para descargar</label><br>
+    <div class="col-md-12"
+         x-ref="ref_focus_prevencion"
+         x-show="listaActaFirmadaAdmisionSolicitud.length">
+        <label>Autos disponibles para descargar</label><br>
         <div class="btn-group">
             <template x-for="(item, index) in listaActaFirmadaAdmisionSolicitud">
                 <a key="index" type="button" :href="path_file() + item.path_acta_firmada" class="btn btn-outline-info" target="_blank" title="Descargar acta">
@@ -250,14 +245,28 @@
         </div>
     </div>
 </div>
-<div class="row pt-4">
-    <div class="col-md-12 text-center" x-show="loading">
+<div class="row pt-4" x-show="prevencionPendiente && prevencionVigente">
+    <div class="col-md-12">
+        <div class="form-group clearfix">
+            <div class="icheck-success">
+                <input type="checkbox"
+                       value="1"
+                       name="resolver_prevencion"
+                       x-model="resolver_prevencion"
+                       id="check_resolver_prevencion">
+                <label for="check_resolver_prevencion">Resolver prevención</label>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-12 text-center"
+         x-show="loading">
         <div class='text-center'><i class='fas fa-1x fa-sync fa-spin'></i></div>
     </div>
-    <div class="col-md-12">
-        <div class="btn-group" x-show="!loading">
+    <div class="col-md-12"
+         x-show="resolver_prevencion">
+        <div class="btn-group"
+             x-show="!loading">
             <button @click="actualizarEnviar"
-                    x-show="prevencionPendiente && prevencionVigente"
                     class="btn btn-success">
                 Guardar cambios y enviar <i class="fa fa-save"></i>
             </button>

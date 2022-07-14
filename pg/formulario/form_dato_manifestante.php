@@ -103,17 +103,3 @@
             </div>
         </div>
     </div>
-    <div class="row">
-        <div class="col-md-12 text-center" x-show="loading">
-            <div class='text-center'><i class='fas fa-1x fa-sync fa-spin'></i></div>
-        </div>
-        <div class="col-md-12">
-            <div class="btn-group">
-                <button @click="actualizarEnviar"
-                        x-show="prevencionPendiente && prevencionVigente"
-                        class="btn btn-success">
-                    Guardar cambios y enviar <i class="fa fa-save"></i>
-                </button>
-            </div>
-        </div>
-    </div>
