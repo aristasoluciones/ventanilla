@@ -1,6 +1,6 @@
 <!-- vista previa dropzone -->
 <div x-data="componenteRecursoRec()" id="zone-file-recurso" x-init="iniciar(<?= $id ?>)">
-    <div class="row" x-show="!(id_solicitud > 0)">
+    <div class="row" x-show="!(id_solicitud_recurso > 0)">
         <div class="callout callout-info">
             <p>
                 <?= nl2br($config['instruccion_pprr']->valor) ?>
