@@ -67,8 +67,8 @@ $items = !is_array($results) ? [] :  $results;
                             }
                             $sufixEtapa = $sufixEtapa ? "<br>(".$sufixEtapa.")" : "";
                             $bagEstatus = "<small class='badge badge-success'>".$item->etapa.$sufixEtapa."</small>";
-                            if (($item->finalizado && (int)$item->tipo_respuesta_etapa === 3) || $item->existe_recurso) {
-                                if (date('Y-m-d') <= $item->fecha_vencimiento_etapa) {
+                            if (($item->finalizado && (int)$item->tipo_respuesta_etapa === 3)) {
+                                if ((date('Y-m-d') <= $item->fecha_vencimiento_etapa) || $item->existe_recurso) {
                                     $bagRecurso = "<a href='javascript:;' title='Presentar recurso de reconsideración' onclick='parent.open_modal_recurso_reconsideracion(" . $item->id_solicitud_queja . ")'>";
                                     $bagRecurso .= $item->existe_recurso
                                         ? "<small class='badge badge-primary'>Recurso de reconsideración existente</small>"

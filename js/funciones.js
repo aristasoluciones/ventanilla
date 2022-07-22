@@ -14,5 +14,5 @@ head.js("plugins/jquery/jquery.min.js","plugins/bootstrap/js/bootstrap.bundle.mi
 "plugins/chart.js/Chart.min.js", "plugins/jquery-validation/jquery.validate.min.js",  "plugins/jquery-validation/localization/messages_es.min.js", function(){
 });
 var random_hash =  (Math.random() + 1).toString(36).substring(4)
-head.js("js/funciones_ventanilla.js?" + random_hash, "js/scriptsGoogleMaps.js")
+head.js("js/funcion_ventanilla_helper.js", "js/funciones_ventanilla.js?" + random_hash, "js/scriptsGoogleMaps.js")
 head.js("plugins/alpinejs/alpine.min.js")
