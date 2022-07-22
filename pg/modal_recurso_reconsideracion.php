@@ -51,17 +51,21 @@ $path_instruccion = isset($config['instruccion_pprr'])
                     default : return '/turismo'
                 }
             },
-            current_recurso: {
-                etapa_actual_completo: { class:null, nombre: null},
-                pila_seguimiento: [],
-            },
+            helper_ventanilla: null,
+            resolver_prevencion: null,
             id_solicitud: null,
+            parent_id: null,
             id_solicitud_recurso: null,
+            pila_seguimiento: [],
+            current_recurso: {
+                etapa_actual_completo: { class:null, nombre: null}
+            },
             dropzones_recurso: [],
             totalFiles: 0,
             loading: false,
             archivos: [],
             evidencias: [],
+            escritos: [],
 
             inicializarRecurso (data) {
                 this.current_recurso    = Object.assign( this.current_recurso, { ...data });
@@ -69,9 +73,15 @@ $path_instruccion = isset($config['instruccion_pprr'])
                     ? JSON.parse(this.current_recurso.seguimiento) : [];
 
                 let current_etapa = this.pila_seguimiento.find((el) => parseInt(el.id) === parseInt(this.current_recurso.etapa));
-                if (current_etapa !== null)
-                    this.current_recurso.etapa_actual_completo = { ...current_etapa };
+                if (current_etapa !== null) {
+                    this.current_recurso.etapa_actual_completo = {...current_etapa};
+                    if (parseInt(this.current_recurso.etapa_actual_completo.id) === 2 && this.current_recurso.etapa_actual_completo.subsanado) {
+                        this.current_recurso.etapa_actual_completo.class = 'bg-info';
+                        this.current_recurso.etapa_actual_completo.nombre = 'En Prevención(Subsanado)';
+                    }
+                }
             },
+
             async iniciar (id) {
                 this.id_solicitud = id;
                 // es un solo RR que se puede presentar.
@@ -88,6 +98,8 @@ $path_instruccion = isset($config['instruccion_pprr'])
                 const response = await peticion.json()
                 if (response.data !== null) {
                     this.id_solicitud_recurso = response.data.id_solicitud_queja_recurso;
+                    this.parent_id = response.data.id_solicitud_queja_recurso;
+                    this.inicializarRecurso(response.data);
                     this.setFiles(response);
                 }
             },
@@ -116,7 +128,7 @@ $path_instruccion = isset($config['instruccion_pprr'])
                         previewsContainer: previewsContainer, // Define the container to display the previews
                         clickable: elementClickable, // Define the element that should be used as click trigger to select files.
                     });
-                    myDropzone.on('queuecomplete', () => this.calcularTotal())
+                    myDropzone.on('queuecomplete', () => this.calcularTotal());
                     myDropzone.on('removedfile', (file) =>{
                         if (file.previewElement != null && file.previewElement.parentNode != null) {
                             file.previewElement.parentNode.removeChild(file.previewElement);
@@ -125,7 +137,8 @@ $path_instruccion = isset($config['instruccion_pprr'])
                         return myDropzone._updateMaxFilesReachedClass();
                     });
                     this.dropzones_recurso.push(myDropzone);
-                })
+                });
+                this.helper_ventanilla = new  helperVentanilla();
             },
 
             async enviarRecurso () {
@@ -156,50 +169,13 @@ $path_instruccion = isset($config['instruccion_pprr'])
                     return;
                 }
                 this.id_solicitud_recurso = response.data.id_solicitud_queja_recurso;
+                this.inicializarRecurso(response.data);
                 this.setFiles(response);
                 mostrar_mensaje('Exito', 'Se ha enviado el recurso de reconsideración.', 'success');
                 this.dropzones_recurso.forEach(dropzone => {
                    dropzone.removeAllFiles(true);
                 });
 
-
-            },
-
-            async removeFileRecurso(file) {
-                const confirmacion = await Swal.fire({
-                    title: '¿Esta seguro de realizar esta accioón?',
-                    showDenyButton: true,
-                    showCancelButton: true,
-                    confirmButtonText: 'Si',
-                    denyButtonText: `No`,
-                })
-                if (confirmacion.isDenied || confirmacion.isDismissed)
-                    return
-
-                const path = this.path_site();
-                const peticion =  await fetch(path + '/php/ventanilla_eliminar.php', {
-                    method: 'post',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({
-                        opcion: 2,
-                        file: file,
-                        id: this.id_solicitud_recurso })
-                });
-                const response = await peticion.json()
-                if (response.resp === 0 ) {
-                    mostrar_mensaje('Error','Ocurrio un error al eliminar');
-                    return;
-                }
-                this.id_solicitud_recurso = response.data.id_solicitud_recurso ?? null;
-
-                this.id_solicitud_recurso = response.data.hasOwnProperty('id_solicitud_queja_recurso')
-                    ? response.data.id_solicitud_queja_recurso
-                    : null;
-                this.setFiles(response);
-
-                mostrar_mensaje('Exito','Se ha eliminado correctamente', 'success');
             },
 
             calcularTotal () {
@@ -216,10 +192,48 @@ $path_instruccion = isset($config['instruccion_pprr'])
                 this.evidencias = !response.data.hasOwnProperty('evidencia')
                     ? []
                     : JSON.parse(response.data.evidencia);
-                this.archivos = !response.data.hasOwnProperty('archivo')
+                this.escritos = !response.data.hasOwnProperty('archivo')
                     ? []
                     : JSON.parse(response.data.archivo);
-            }
+            },
+
+            prevencionVigente () {
+                let flag = false
+                if ([2].includes(parseInt(this.current_recurso.etapa))) {
+                    console.log(this.pila_seguimiento);
+                    let seguimiento_corriente = this.pila_seguimiento.find((item) => parseInt(item.id) === 2)
+                    let fecha_corriente   =  moment().format('YYYY-MM-DD')
+                    let fecha_vencimiento  = moment(seguimiento_corriente.fecha).add(3, 'days').format('YYYY-MM-DD')
+                    flag = fecha_vencimiento >= fecha_corriente && !seguimiento_corriente.subsanado
+                }
+                return flag
+            },
+
+            enPrevencion() {
+                return [2].includes(parseInt(this.current_recurso.etapa));
+            },
+
+            listadoActas () {
+                let actas_disponibles = [];
+                this.pila_seguimiento.forEach((item) => {
+                    if (item.actas !== null) {
+                        item.actas.forEach((item2) =>{
+                            switch (parseInt(item2.tipo)) {
+                                case 1:
+                                    item2.title = 'Acuerdo de admisión';
+                                    if (parseInt(item.id) === 3)
+                                        item2.title = 'Auto de resolución';
+                                    break;
+                                case 2: item2.title = 'Auto de desechamiento'; break;
+                                case 3: item2.title = 'Auto de prevención'; break;
+                            }
+                            actas_disponibles.push(item2);
+                        })
+                    }
+                });
+                this.archivos = actas_disponibles;
+                return actas_disponibles;
+            },
         }
     }
 </script>

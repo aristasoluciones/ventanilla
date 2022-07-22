@@ -1,21 +1,55 @@
 <!-- vista previa dropzone -->
-<div x-data="componenteRecursoRec()" id="zone-file-recurso" x-init="iniciar(<?= $id ?>)">
-    <div class="row" x-show="!(id_solicitud_recurso > 0)">
-        <div class="callout callout-info">
-            <p>
-                <?= nl2br($config['instruccion_pprr']->valor) ?>
-            </p>
-            <?php if ($path_instruccion) { ?>
-                <a type="button" class="btn btn-success"
-                   target="_blank"
-                   title="Descargar guía"
-                   href="<?= $path_instruccion ?>">
-                    Descargar guía <i class="fa fa-download"></i>
-                </a>
-            <?php } ?>
+<div x-data="componenteRecursoRec()"
+     id="zone-file-recurso"
+     x-init="iniciar(<?= $id ?>)">
+    <div class="row">
+        <div class="col-md-12" x-show="id_solicitud_recurso > 0">
+            <h3><strong>Folio:</strong><span x-text="current_recurso.folio"></span></h3>
+        </div>
+        <div class="col-md-12"
+             x-show="id_solicitud_recurso > 0">
+            <div :class="'callout callout-' + (current_recurso.etapa_actual_completo.class !== null ?
+            current_recurso.etapa_actual_completo.class.replace('bg-', '') : '')">
+                <p><strong>Estatus: </strong><span x-text="current_recurso.etapa_actual_completo.nombre"></span></p>
+                <p x-show="enPrevencion && prevencionVigente">Esta solicitud se encuentra en estado de prevención,
+                    consulte los detalles en el documento de <strong>Auto de prevención.</strong></p>
+                <p x-show="enPrevencion && !prevencionVigente">Se ha vencido el plazo para subsanar la prevención de esta solicitud.</p>
+            </div>
+        </div>
+        <div class="col-md-12">
+            <div class="callout callout-info" x-show="id_solicitud_recurso <= 0">
+                <p>
+                    <?= nl2br($config['instruccion_pprr']->valor) ?>
+                </p>
+                <?php if ($path_instruccion) { ?>
+                    <a type="button" class="btn btn-success"
+                       target="_blank"
+                       title="Descargar guía"
+                       href="<?= $path_instruccion ?>">
+                        Descargar guía <i class="fa fa-download"></i>
+                    </a>
+                <?php } ?>
+            </div>
+        </div>
+        <!-- listado de actas generadas -->
+        <div x-show="listadoActas().length > 0"
+             x-data="{
+                archivos,
+                titulo: 'Autos y/o acuerdos generados',
+                sufix_modal: `listado_acta_${parent_id}`,
+                parent_id,
+                clase:'col-md-12',
+                comentar: 0,
+                validar: 0,
+                path_file:path_file(),
+              }">
+            <?php include ('form_componente_lista_archivo.php'); ?>
         </div>
     </div>
-    <form name="frm-configuracion" id="frm-configuracion" enctype="multipart/form-data" onsubmit="return false">
+    <form name="frm-configuracion"
+          id="frm-configuracion"
+          enctype="multipart/form-data"
+          onsubmit="return false">
         <div class="form-row">
             <div class="col-md-4 dropzone-recurso" id="acta">
                 <div class="form-group">
@@ -57,13 +91,11 @@
                         <th colspan="2">Escrito presentado</th>
                     </thead>
                     <tbody>
-                        <template x-for="(archivo, index) in archivos">
+                        <template x-for="(archivo, index) in escritos">
                         <tr>
                             <td x-text="archivo.title"></td>
                             <td>
                                 <div class="btn btn-xs btn-group">
-                                    <button @click="removeFileRecurso(archivo)"
-                                            class="btn btn-xs btn-danger"><i class="fa fa-trash"></i></button>
                                     <button title="Vista previa"
                                             :data-target="'#ep_modal_' + index"
                                             data-toggle="modal"
@@ -74,7 +106,7 @@
                                     <div class="modal-dialog modal-lg modal-dialog-centered">
                                         <div class="modal-content">
                                             <div class="modal-header">
-                                                <h4 class="modal-title">Evidencia</h4>
+                                                <h4 class="modal-title">Escrito</h4>
                                                 <button type="button"
                                                         class="close"
                                                         @click="$('.modal-vp').modal('hide');">&times;</button>
@@ -149,8 +181,6 @@
                             <td x-text="evidencia.title"></td>
                             <td>
                                 <div class="btn btn-xs btn-group">
-                                    <button @click="removeFileRecurso(evidencia)"
-                                            class="btn btn-xs btn-danger"><i class="fa fa-trash"></i></button>
                                     <button title="Vista previa"
                                             :data-target="'#ev_modal_' + index"
                                             data-toggle="modal"
@@ -191,10 +221,22 @@
             </div>
         </div>
         <div class="form-row">
+            <div class="col-md-12" x-show="enPrevencion && prevencionVigente">
+                <div class="form-group clearfix">
+                    <div class="icheck-success">
+                        <input type="checkbox"
+                               value="1"
+                               name="resolver_prevencion"
+                               x-model="resolver_prevencion"
+                               id="check_resolver_prevencion">
+                        <label for="check_resolver_prevencion">Resolver prevención</label>
+                    </div>
+                </div>
+            </div>
             <div class="col-md-12">
                 <div class='text-center' x-show="loading"><i class='fas fa-1x fa-sync fa-spin'></i></div>
                 <button class="btn btn-info" @click="enviarRecurso"
-                x-show="totalFiles && !loading">Enviar</button>
+                x-show="(totalFiles > 0 && !loading && id_solicitud_recurso <= 0) || (enPrevencion && prevencionVigente && resolver_prevencion && totalFiles>0)">Enviar</button>
             </div>
         </div>
     </form>
