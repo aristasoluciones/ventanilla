@@ -41,17 +41,32 @@
             <template x-for="(archivo, index) in current_manifestacion.evidencia.imagen">
                 <tr>
                     <td>
-                        <span x-text="archivo.title"></span><br>
-                        <div class="input-group" x-show="typeof current_manifestacion.evidencia.imagen[index].comment_prestador !== 'undefined'">
-                                      <textarea
-                                              class="form-control card-text"
-                                              x-model="current_manifestacion.evidencia.imagen[index].comment_prestador"></textarea>
-                            <button x-show="typeof current_manifestacion.evidencia.imagen[index].comment_prestador !== 'undefined'"
-                                    class="btn btn-xs btn-danger"
-                                    @click="delete current_manifestacion.evidencia.imagen[index].comment_prestador"
-                                    title="Eliminar comentario">
-                                <i class="fa fa-remove"></i>
-                            </button>
+                        <div class="row text-sm">
+                            <div class="col-12">
+                                <span x-text="archivo.title"></span>
+                            </div>
+                            <div class="col-12" :id="'accordion_' + index" x-show="typeof current_manifestacion.evidencia.imagen[index].comment_prestador !== 'undefined' || typeof current_manifestacion.evidencia.imagen[index].comment !== 'undefined'">
+                                <div class="card card-outline card-info">
+                                    <div class="card-header p-0">
+                                        <h5 class="mb-0">
+                                            <button class="btn btn-link" data-toggle="collapse" :data-target="'#imgcollapse_' + index" aria-expanded="true" :aria-controls="'#imgcollapse_' + index">
+                                                Comentarios
+                                            </button>
+                                        </h5>
+                                    </div>
+                                    <div :id="'imgcollapse_' + index" class="collapse" aria-labelledby="headingOne" :data-parent="'#accordion_' + index">
+                                    <div class="card-body">
+                                        <dl>
+                                            <dt x-show="typeof current_manifestacion.evidencia.imagen[index].comment_prestador !== 'undefined'">Prestador de servicios</dt>
+                                            <dd x-show="typeof current_manifestacion.evidencia.imagen[index].comment_prestador !== 'undefined'" x-text="current_manifestacion.evidencia.imagen[index].comment_prestador"></dd>
+
+                                            <dt x-show="typeof current_manifestacion.evidencia.imagen[index].comment !== 'undefined'">Funcionario</dt>
+                                            <dd x-show="typeof current_manifestacion.evidencia.imagen[index].comment !== 'undefined'" x-text="current_manifestacion.evidencia.imagen[index].comment"></dd>
+                                        </dl>
+                                    </div>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </td>
                     <td>
@@ -60,10 +75,6 @@
                                     :data-target="'#et_modal_img_' + index"
                                     data-toggle="modal"
                                     class="btn btn-xs btn-info"><i class="fas fa-eye"></i></button>
-                            <button x-show="prevencionPendiente && prevencionVigente"
-                                    title="Eliminar"
-                                    @click="removeFile(archivo)"
-                                    class="btn btn-xs btn-danger"><i class="fas fa-trash"></i></button>
                         </div>
                         <div class="modal fade" :id="'et_modal_img_' + index" role="dialog">
                             <div class="modal-dialog modal-dialog-centered">
@@ -123,17 +134,41 @@
                 </tr>
                 <template x-for="(archivo, index) in current_manifestacion.evidencia.doc">
                     <tr>
-                        <td x-text="archivo.title"></td>
+                        <td>
+                            <div class="row text-sm">
+                                <div class="col-12">
+                                    <span x-text="archivo.title"></span>
+                                </div>
+                                <div class="col-12" :id="'doc_accordion_' + index" x-show="typeof current_manifestacion.evidencia.doc[index].comment_prestador !== 'undefined' || typeof current_manifestacion.evidencia.doc[index].comment !== 'undefined'">
+                                    <div class="card card-outline card-info">
+                                        <div class="card-header p-0">
+                                            <h5 class="mb-0">
+                                                <button class="btn btn-link" data-toggle="collapse" :data-target="'#doc_collapse_' + index" aria-expanded="true" :aria-controls="'#doc_collapse_' + index">
+                                                    Comentarios
+                                                </button>
+                                            </h5>
+                                        </div>
+                                        <div :id="'doc_collapse_' + index" class="collapse" :data-parent="'#doc_accordion_' + index">
+                                            <div class="card-body">
+                                                <dl>
+                                                    <dt x-show="typeof current_manifestacion.evidencia.doc[index].comment_prestador !== 'undefined'">Prestador de servicios</dt>
+                                                    <dd x-show="typeof current_manifestacion.evidencia.doc[index].comment_prestador !== 'undefined'" x-text="current_manifestacion.evidencia.doc[index].comment_prestador"></dd>
+
+                                                    <dt x-show="typeof current_manifestacion.evidencia.doc[index].comment !== 'undefined'">Funcionario</dt>
+                                                    <dd x-show="typeof current_manifestacion.evidencia.doc[index].comment !== 'undefined'" x-text="current_manifestacion.evidencia.doc[index].comment"></dd>
+                                                </dl>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </td>
                         <td>
                             <div class="btn btn-xs btn-group">
                                 <button title="Vista previa"
                                         :data-target="'#et_modal_doc_' + index"
                                         data-toggle="modal"
                                         class="btn btn-xs btn-info"><i class="fas fa-eye"></i></button>
-                                <button x-show="prevencionPendiente && prevencionVigente"
-                                        title="Eliminar"
-                                        @click="removeFile(archivo)"
-                                        class="btn btn-xs btn-danger"><i class="fas fa-trash"></i></button>
                             </div>
                             <div class="modal fade" :id="'et_modal_doc_' + index" role="dialog">
                                 <div class="modal-dialog modal-lg modal-dialog-centered">
@@ -193,17 +228,41 @@
                 </tr>
                 <template x-for="(archivo, index) in current_manifestacion.evidencia.video">
                     <tr>
-                        <td x-text="archivo.title"></td>
+                        <td>
+                            <div class="row text-sm">
+                                <div class="col-12">
+                                    <span x-text="archivo.title"></span>
+                                </div>
+                                <div class="col-12" :id="'video_accordion_' + index" x-show="typeof current_manifestacion.evidencia.video[index].comment_prestador !== 'undefined' || typeof current_manifestacion.evidencia.video[index].comment !== 'undefined'">
+                                    <div class="card card-outline card-info">
+                                        <div class="card-header p-0">
+                                            <h5 class="mb-0">
+                                                <button class="btn btn-link" data-toggle="collapse" :data-target="'#video_collapse_' + index" aria-expanded="true" :aria-controls="'#video_collapse_' + index">
+                                                    Comentarios
+                                                </button>
+                                            </h5>
+                                        </div>
+                                        <div :id="'video_collapse_' + index" class="collapse" aria-labelledby="headingOne" :data-parent="'#video_accordion_' + index">
+                                            <div class="card-body">
+                                                <dl>
+                                                    <dt x-show="typeof current_manifestacion.evidencia.video[index].comment_prestador !== 'undefined'">Prestador de servicios</dt>
+                                                    <dd x-show="typeof current_manifestacion.evidencia.video[index].comment_prestador !== 'undefined'" x-text="current_manifestacion.evidencia.video[index].comment_prestador"></dd>
+
+                                                    <dt x-show="typeof current_manifestacion.evidencia.video[index].comment !== 'undefined'">Funcionario</dt>
+                                                    <dd x-show="typeof current_manifestacion.evidencia.video[index].comment !== 'undefined'" x-text="current_manifestacion.evidencia.video[index].comment"></dd>
+                                                </dl>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </td>
                         <td>
                             <div class="btn btn-xs btn-group">
                                 <button title="Vista previa"
                                         :data-target="'#et_modal_video_' + index"
                                         data-toggle="modal"
                                         class="btn btn-xs btn-info"><i class="fas fa-eye"></i></button>
-                                <button x-show="prevencionPendiente && prevencionVigente"
-                                        title="Eliminar"
-                                        @click="removeFile(archivo)"
-                                        class="btn btn-xs btn-danger"><i class="fas fa-trash"></i></button>
                             </div>
                             <div class="modal fade" :id="'et_modal_video_' + index" role="dialog">
                                 <div class="modal-dialog modal-lg modal-dialog-centered">

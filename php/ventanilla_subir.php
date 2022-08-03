@@ -58,6 +58,7 @@
                     $cad['title'] = $file_name;
                     $cad['path'] = $path;
                     $cad['validado'] = false;
+                    $cad['fecha_registro'] = date('Y-m-d H:i:s');
                     array_push($archivos[$tipo], $cad);
 
                     $archivos_json = count($archivos) ? "'" . json_encode($archivos) . "'" : 'NULL';
@@ -161,6 +162,7 @@
                             $cad['title'] = $fileName;
                             $cad['path'] = $path;
                             $cad['tipo'] = $key;
+                            $cad['fecha_registro'] = date('Y-m-d H:i:s');
                             switch($key) {
                                 case 'acta': array_push($actas, $cad); break;
                                 case 'evidencia': array_push($evidencias, $cad); break;
